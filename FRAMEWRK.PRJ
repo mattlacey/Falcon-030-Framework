@@ -1,0 +1,7 @@
+framewrk.prg
+=
+pcstart.o
+* (framewrk.h)
+pcstdlib.lib
+pcextlib.lib
+pctoslib.lib
