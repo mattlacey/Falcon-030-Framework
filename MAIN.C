@@ -60,9 +60,9 @@ int main(int argc, char ** argv)
 	while(1)
 	{
 		if(tick & 1)
-			xbios(5, buffers[0], buffers[1], 3, (int)V_MODE);
+			xbios(5, buffers[0], buffers[1], -1, -1);
 		else
-			xbios(5, buffers[1], buffers[0], 3, (int)V_MODE);
+			xbios(5, buffers[1], buffers[0], -1, -1);
 
 		Vsync();
 
