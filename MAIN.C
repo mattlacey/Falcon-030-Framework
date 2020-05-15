@@ -6,6 +6,8 @@
 
 #include "framewrk.h"
 
+#include "tri.h"
+
 #define DEBUG	0
 
 #define VM_BPS16	0x4
@@ -29,6 +31,8 @@ int main(int argc, char ** argv)
 	long tick = 0;
 	long i;
 	long screenSize;
+	
+	Tri t;
 
 	void * prevLogBase;
 	void * prevPhyBase;
@@ -37,6 +41,12 @@ int main(int argc, char ** argv)
 	
 	void * t1;
 	void * t2;
+	
+	t.verts[0].x = 20;
+	t.verts[0].y = 20;
+	
+	t.verts[1].x = 280;
+	t.verts[1].y = 220;
 	
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
@@ -51,21 +61,27 @@ int main(int argc, char ** argv)
 		return 1;
 	}
 
-	memset(buffers[0], 0xf0, screenSize);
-	memset(buffers[1], 0x07, screenSize);
+	memset(buffers[0], 0x00, screenSize);
+	memset(buffers[1], 0x00, screenSize);
 	
 	prevMode = VgetMode();
-	xbios(5, buffers[0], buffers[1], 3, (int)V_MODE);
+	xbios(5, buffers[1], buffers[0], 3, (int)V_MODE);
 
 	while(1)
 	{
-		current = buffers[0];
-		buffers[0] = buffers[1];
-		buffers[1] = current;
-	
-		xbios(5, buffers[0], buffers[1], -1, -1);
+	/*
+		current = buffers[1];
+		buffers[1] = buffers[0];
+		buffers[0] = current;
+	*/
+		if(tick & 1)
+			xbios(5, buffers[0], buffers[1], -1, -1);
+		else
+			xbios(5, buffers[1], buffers[0], -1, -1);
 
 		Vsync();
+		
+/*		renderTri(&t, buffers[0]);*/
 
 		if(kbhit())
 		{
