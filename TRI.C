@@ -12,30 +12,55 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned col)
 	
 	long dx = x2 - x1;
 	long dy = y2 - y1;
+	long tdx = dx << 1;
 	long tdy = dy << 1;
-	long tdymtdx = tdy - (dx << 1);
+	long tdxmtdy = tdx - tdy;
+	long tdymtdx = tdy - tdx;
 	
 	long x = x1;
 	long y = y1;
-	long tx = x2;
 	long p;
 	
+	long xinc = (x1 > x2 ? -1 : 1);
+	long yinc = (y1 > y2 ? -1 : 1);
+
 	p = tdy - dx;
 	
-	while(x < tx)
+	if(dx > dy)
 	{
-		*((unsigned *)pBuffer + x + (y * (long)320)) = col;
-		if(p < 0)
+		while(x != x2)
 		{
-			p = p + tdy;
+			*((unsigned *)pBuffer + x + (y * (long)320)) = col;
+			if(p < 0)
+			{
+				p = p + tdy;
+			}
+			else
+			{
+				p = p + tdymtdx;
+				y += yinc;
+			}
+	
+			x += xinc;
 		}
-		else
+	}
+	else
+	{
+		while(y != y2)
 		{
-			p = p + tdymtdx;
-			y++;
+			*((unsigned *)pBuffer + x + (y * (long)320)) = col;
+			if(p < 0)
+			{
+				p = p + tdx;
+			}
+			else
+			{
+				p = p + tdxmtdy;
+				x += xinc;
+			}
+	
+			y += yinc;
 		}
-		
-		x++;
 	}
 	
 	return;
