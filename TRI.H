@@ -8,7 +8,7 @@ typedef struct Tri
 	V3 verts[3];
 } Tri;
 
-void renderTri(Tri *pTri, void *pBuffer, unsigned col);
-void renderLine(long x1, long y1, long x2, long y2, void *pBuffer, unsigned col);
+void renderTri(Tri *pTri, void *pBuffer, unsigned int col);
+void renderLine(long x1, long y1, long x2, long y2, void *pBuffer, unsigned int col);
 
 #endif

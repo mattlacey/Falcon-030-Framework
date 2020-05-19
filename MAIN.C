@@ -28,7 +28,7 @@ int VgetMode(void)
 int main(int argc, char ** argv)
 {
 	int prevMode;
-	long tick = 0;
+	unsigned long tick = 0;
 	long i;
 	long screenSize;
 	
@@ -78,14 +78,17 @@ int main(int argc, char ** argv)
 		current = buffers[1];
 		buffers[1] = buffers[0];
 		buffers[0] = current;
-
-		xbios(5, -1, buffers[1], -1);
+	
+		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
 		
+		t.verts[0].x = 20 + ((tick - 2) & 0x00ff);
+		t.verts[1].x = 320 - ((tick - 2) & 0x00ff);
 		renderTri(&t, buffers[0], 0x0000);
+
 		t.verts[0].x = 20 + (tick & 0x00ff);
 		t.verts[1].x = 320 - (tick & 0x00ff);
-		renderTri(&t, buffers[0], tick & 0xffff);
+		renderTri(&t, buffers[0], 0xf800);
 
 		if(kbhit())
 		{
