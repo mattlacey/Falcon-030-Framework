@@ -62,26 +62,29 @@ int main(int argc, char ** argv)
 	}
 
 	memset(buffers[0], 0x00, screenSize);
-	memset(buffers[1], 0x00, screenSize);
 	
 	prevMode = VgetMode();
 	xbios(5, buffers[1], buffers[0], 3, (int)V_MODE);
 
+	/* this buffer gets trashed by VSetscreen so clear here */
+	memset(buffers[1], 0x00, screenSize);
+	xbios(5, buffers[1], buffers[1], -1);
+
 	while(1)
 	{
-	/*
+		/*
 		current = buffers[1];
 		buffers[1] = buffers[0];
 		buffers[0] = current;
-	*/
-		if(tick & 1)
-			xbios(5, buffers[0], buffers[1], -1, -1);
-		else
-			xbios(5, buffers[1], buffers[0], -1, -1);
+		*/
+
+		xbios(5, buffers[1], buffers[0], -1);
 
 		Vsync();
 		
-/*		renderTri(&t, buffers[0]);*/
+		renderTri(&t, buffers[0], 0x0000);
+		t.verts[1].y = (20 + tick) & 0x007f;
+		renderTri(&t, buffers[0], tick & 0xffff);
 
 		if(kbhit())
 		{
@@ -91,7 +94,7 @@ int main(int argc, char ** argv)
 				break;
 		}
 		
-		tick = tick + 1;
+		tick++;
 	}
 
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
