@@ -48,6 +48,9 @@ int main(int argc, char ** argv)
 	t.verts[1].x = 280;
 	t.verts[1].y = 220;
 	
+	t.verts[2].x = 280;
+	t.verts[2].y = 120;
+	
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
 	
@@ -72,18 +75,15 @@ int main(int argc, char ** argv)
 
 	while(1)
 	{
-		/*
 		current = buffers[1];
 		buffers[1] = buffers[0];
 		buffers[0] = current;
-		*/
 
-		xbios(5, buffers[1], buffers[0], -1);
-
+		xbios(5, -1, buffers[1], -1);
 		Vsync();
 		
 		renderTri(&t, buffers[0], 0x0000);
-		t.verts[0].x = 20 + (tick & 0x00ff);		
+		t.verts[0].x = 20 + (tick & 0x00ff);
 		t.verts[1].x = 320 - (tick & 0x00ff);
 		renderTri(&t, buffers[0], tick & 0xffff);
 

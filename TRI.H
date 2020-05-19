@@ -9,5 +9,6 @@ typedef struct Tri
 } Tri;
 
 void renderTri(Tri *pTri, void *pBuffer, unsigned col);
+void renderLine(long x1, long y1, long x2, long y2, void *pBuffer, unsigned col);
 
 #endif

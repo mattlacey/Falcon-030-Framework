@@ -5,63 +5,41 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned col)
 	/* draw p1 -> p2 */
 	V3 *verts = pTri->verts;
 
-	long x1 = verts[0].x;
-	long y1 = verts[0].y;
-	long x2 = verts[1].x;
-	long y2 = verts[1].y;
-	
-	long dx = x2 - x1;
-	long dy = y2 - y1;
-	long tdx = dx << 1;
-	long tdy = dy << 1;
-	long tdxmtdy = tdx - tdy;
-	long tdymtdx = tdy - tdx;
-	
+	renderLine(verts[0].x, verts[0].y, verts[1].x, verts[1].y, pBuffer, col);
+	renderLine(verts[0].x, verts[0].y, verts[2].x, verts[2].y, pBuffer, col);
+	renderLine(verts[1].x, verts[1].y, verts[2].x, verts[2].y, pBuffer, col);
+}
+
+void renderLine(long x1, long y1, long x2, long y2, void *pBuffer, unsigned col)	
+{
 	long x = x1;
 	long y = y1;
-	long p;
-	
-	long xinc = (x1 > x2 ? -1 : 1);
-	long yinc = (y1 > y2 ? -1 : 1);
+	long dx = (x1 < x2 ? x2 - x1 : x1 - x2);
+	long sx = (x1 < x2 ? 1 : -1);
 
-	p = tdy - dx;
-	
-	if(dx > dy)
+	long dy = - (y1 < y2 ? y2 - y1 : y1 - y2);
+	long sy = (y1 < y2 ? 1 : -1);
+	long err = dx + dy;
+	long err2;
+
+	while(1)
 	{
-		while(x != x2)
+		*((unsigned *)pBuffer + x + (y * (long)320)) = col;
+		
+		if(x == x2 || y == y2) break;
+		
+		err2 = 2 * err;
+		
+		if(err2 >= dy)
 		{
-			*((unsigned *)pBuffer + x + (y * (long)320)) = col;
-			if(p < 0)
-			{
-				p = p + tdy;
-			}
-			else
-			{
-				p = p + tdymtdx;
-				y += yinc;
-			}
-	
-			x += xinc;
+			err += dy;
+			x += sx;
+		}
+		
+		if(err2 <= dx)
+		{
+			err += dx;
+			y += sy;
 		}
 	}
-	else
-	{
-		while(y != y2)
-		{
-			*((unsigned *)pBuffer + x + (y * (long)320)) = col;
-			if(p < 0)
-			{
-				p = p + tdx;
-			}
-			else
-			{
-				p = p + tdxmtdy;
-				x += xinc;
-			}
-	
-			y += yinc;
-		}
-	}
-	
-	return;
 }
