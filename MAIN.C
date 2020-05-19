@@ -83,7 +83,8 @@ int main(int argc, char ** argv)
 		Vsync();
 		
 		renderTri(&t, buffers[0], 0x0000);
-		t.verts[1].y = (20 + tick) & 0x007f;
+		t.verts[0].x = 20 + (tick & 0x00ff);		
+		t.verts[1].x = 320 - (tick & 0x00ff);
 		renderTri(&t, buffers[0], tick & 0xffff);
 
 		if(kbhit())
