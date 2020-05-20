@@ -89,6 +89,9 @@ int main(int argc, char ** argv)
 		t.verts[0].x = 20 + (tick & 0x00ff);
 		t.verts[1].x = 320 - (tick & 0x00ff);
 		renderTri(&t, buffers[0], 0xf800);
+		
+		renderSpan(20, 30 + (tick - 2) & 0x00ff, 50, 0x0000, buffers[0]);
+		renderSpan(20, 30 + tick & 0x00ff, 50, 0xffff, buffers[0]);
 
 		if(kbhit())
 		{

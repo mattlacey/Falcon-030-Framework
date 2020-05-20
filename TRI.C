@@ -14,7 +14,6 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 	V3 *right;
 	V3 *temp;
 
-	int left, right;
 	long x[2], y[2], dx[2], dy[2], sx[2], sy[2], err[2], err2[2];
 
 	if(mid->y < top->y)
@@ -56,7 +55,7 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 	dx[1] = (top->x < right->x ? right->x - top->x : top->x - left->x);
 
 	sx[0] = (top->x < left->x ? 1 : -1);
-	sx[1] = (top->x < right-x ? 1 : -1);
+	sx[1] = (top->x < right->x ? 1 : -1);
 
 	dy[0] = - (left->x - top->x);
 	dy[1] = - (right->x - top->x);
@@ -68,8 +67,9 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 
 	while(1)
 	{
-		renderSpan(x[0], x[1], y[0], col);
-		
+		renderSpan(x[0], x[1], y[0], col, pBuffer);
+		break;
+		/*
 		if(x == x2 && y == y2) break;
 		
 		err2 = 2 * err;
@@ -84,11 +84,11 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 		{
 			err += dx;
 			y += sy;
-		}
+		}*/
 	}
 }
 
-void renderSpan(long x1, long x2, long y, unsigned col)
+void renderSpan(long x1, long x2, long y, unsigned col, void *pBuffer)
 {
 	long len = x2 - x1;
 	long i;
