@@ -15,6 +15,7 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 	V3 *temp;
 
 	long x[2], y[2], dx[2], dy[2], sx[2], sy[2], err[2], err2[2];
+	long safe = 1000;
 
 	if(mid->y < top->y)
 	{
@@ -51,14 +52,22 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 		right = mid;
 	}
 
+/*	
+	renderLine(top->x, top->y, left->x, left->y, pBuffer, 0x8f00);
+	renderLine(top->x, top->y, right->x, right->y, pBuffer, 0x00ff);
+*/
+
 	dx[0] = (top->x < left->x ? left->x - top->x : top->x - left->x);
 	dx[1] = (top->x < right->x ? right->x - top->x : top->x - right->x);
 
 	sx[0] = (top->x < left->x ? 1 : -1);
 	sx[1] = (top->x < right->x ? 1 : -1);
 
-	dy[0] = - (left->x - top->x);
-	dy[1] = - (right->x - top->x);
+/*	long dy = - (y1 < y2 ? y2 - y1 : y1 - y2);
+	long sy = (y1 < y2 ? 1 : -1);
+*/	
+	dy[0] = - (left->y - top->y);
+	dy[1] = - (right->y - top->y);
 
 	sy[0] = 1;
 	sy[1] = 1;
@@ -66,9 +75,13 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 	err[0] = dx[0] + dy[0];
 	err[1] = dx[1] + dy[1];
 
-	while(1)
+	while(safe)
 	{
 		renderSpan(x[0], x[1], y[0], col, pBuffer);
+		/*
+		*((unsigned int*)pBuffer + x[0] + (y[0] * (long)320)) = col;
+		*((unsigned int*)pBuffer + x[1] + (y[1] * (long)320)) = col;
+		*/
 
 		if((x[0] == mid->x && y[0] == mid->y)
 			|| (x[1] == mid->x && y[1] == mid->y))
@@ -103,17 +116,21 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 			err[1] += dx[1];
 			y[1] += sy[1];
 		}
+		
+		safe--;
 	}
+		
+	renderLine(top->x, top->y, left->x, left->y, pBuffer, 0xffff);
+	renderLine(top->x, top->y, right->x, right->y, pBuffer, 0x7777);
 }
 
 void renderSpan(long x1, long x2, long y, unsigned col, void *pBuffer)
 {
-	long len = x2 - x1;
 	long i;
 	
-	for(i = 0; i < (len >> 1); i++)
+	for(i = x1; i < x2; i++)
 	{
-		*((unsigned int*)pBuffer + x1 + i + (y * (long)320)) = col;
+		*((unsigned int*)pBuffer + i + (y * (long)320)) = col;
 	}
 }
 
