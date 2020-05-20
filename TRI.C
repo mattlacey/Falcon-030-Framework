@@ -52,7 +52,7 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 	}
 
 	dx[0] = (top->x < left->x ? left->x - top->x : top->x - left->x);
-	dx[1] = (top->x < right->x ? right->x - top->x : top->x - left->x);
+	dx[1] = (top->x < right->x ? right->x - top->x : top->x - right->x);
 
 	sx[0] = (top->x < left->x ? 1 : -1);
 	sx[1] = (top->x < right->x ? 1 : -1);
@@ -64,27 +64,45 @@ void renderTri(Tri *pTri, void *pBuffer, unsigned int col)
 	sy[1] = 1;
 	
 	err[0] = dx[0] + dy[0];
+	err[1] = dx[1] + dy[1];
 
 	while(1)
 	{
 		renderSpan(x[0], x[1], y[0], col, pBuffer);
-		break;
-		/*
-		if(x == x2 && y == y2) break;
-		
-		err2 = 2 * err;
-		
-		if(err2 >= dy)
+
+		if((x[0] == mid->x && y[0] == mid->y)
+			|| (x[1] == mid->x && y[1] == mid->y))
 		{
-			err += dy;
-			x += sx;
+			/* First half done - recalculate left/right accordingly */
+			break;
+		}
+
+		err2[0] = 2 * err[0];
+		err2[1] = 2 * err[1];
+		
+		if(err2[0] >= dy[0])
+		{
+			err[0] += dy[0];
+			x[0] += sx[0];
 		}
 		
-		if(err2 <= dx)
+		if(err2[1] >= dy[1])
 		{
-			err += dx;
-			y += sy;
-		}*/
+			err[1] += dy[1];
+			x[1] += sx[1];
+		}
+		
+		if(err2[0] <= dx[0])
+		{
+			err[0] += dx[0];
+			y[0] += sy[0];
+		}
+		
+		if(err2[1] <= dx[1])
+		{
+			err[1] += dx[1];
+			y[1] += sy[1];
+		}
 	}
 }
 
