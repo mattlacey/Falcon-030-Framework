@@ -8,4 +8,6 @@ typedef struct Vector3
 	long z;
 } V3;
 
+V3 Vec3(long x, long y, long z);
+
 #endif

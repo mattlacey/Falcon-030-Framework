@@ -6,10 +6,12 @@
 typedef struct Tri
 {
 	V3 verts[3];
+	unsigned col;
 } Tri;
 
-void renderTri(Tri *pTri, void *pBuffer, unsigned int col);
+Tri makeTri(V3 v1, V3 v2, V3 v3, unsigned col);
+void renderTri(Tri *pTri, void *pBuffer);
 void renderSpan(long x1, long x2, long y, unsigned col, void *pBuffer);
-void renderLine(long x1, long y1, long x2, long y2, void *pBuffer, unsigned int col);
+void renderLine(long x1, long y1, long x2, long y2, unsigned col, void *pBuffer);
 
 #endif
