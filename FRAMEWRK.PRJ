@@ -4,6 +4,7 @@ pcstart.o
 * (framewrk.h)
 TRI.C
 VECTOR.C
+MATRIX.C
 pcstdlib.lib
 pcextlib.lib
 pctoslib.lib

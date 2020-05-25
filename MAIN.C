@@ -6,6 +6,7 @@
 
 #include "framewrk.h"
 #include "tri.h"
+#include "matrix.h"
 
 #define DEBUG	0
 
@@ -24,7 +25,7 @@ int VgetMode(void)
 	return xbios(88, (int)-1);
 }
 
-int main(int argc, char ** argv)
+int main()
 {
 	int prevMode;
 	unsigned long tick = 0;
@@ -32,19 +33,21 @@ int main(int argc, char ** argv)
 	long screenSize;
 	
 	Tri t1, t2, t3;
+	Mat3d cam;
 
 	void * prevLogBase;
 	void * prevPhyBase;
 	void * buffers[2];
 	void * current;
 
-	t1 = makeTri(Vec3(20, 20, 0), Vec3(80, 20, 0), Vec3(30, 80, 0), 0xf800);
-	t2 = makeTri(Vec3(120, 20, 0), Vec3(200, 100, 0), Vec3(140, 150, 0), 0x07e0);
-	/* Change this second vector back to (200, 230, 0) */
-	t3 = makeTri(Vec3(80, 160, 0), Vec3(40, 230, 0), Vec3(300, 230, 0), 0x001f);
+	t1 = makeTri(Vec3(100, 20, 0), Vec3(200, 30, 0), Vec3(100, 40, 0), 0xf800);
+	t2 = makeTri(Vec3(200, 30, 0), Vec3(100, 40, 0), Vec3(200, 60, 0), 0x07e0);
+	t3 = makeTri(Vec3(200, 160, 0), Vec3(100, 230, 0), Vec3(300, 220, 0), 0x001f);
 	
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
+	
+	setIdentity(cam);
 	
 	screenSize = VgetSize((int)V_MODE);
 	buffers[0] = malloc(screenSize);
