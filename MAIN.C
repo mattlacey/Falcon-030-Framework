@@ -32,7 +32,7 @@ int main()
 	long i;
 	long screenSize;
 	
-	Tri t1, t2, t3;
+	Tri t1, t2, t3, tx;
 	Mat3d cam;
 
 	void * prevLogBase;
@@ -40,14 +40,14 @@ int main()
 	void * buffers[2];
 	void * current;
 
-	t1 = makeTri(Vec3(100, 20, 0), Vec3(200, 30, 0), Vec3(100, 40, 0), 0xf800);
-	t2 = makeTri(Vec3(200, 30, 0), Vec3(100, 40, 0), Vec3(200, 60, 0), 0x07e0);
-	t3 = makeTri(Vec3(200, 160, 0), Vec3(100, 230, 0), Vec3(300, 220, 0), 0x001f);
+	t1 = makeTri(Vec3(-FX_ONE, 0, FX_ONE), Vec3(FX_ONE, 0, FX_ONE),  Vec3(0, FX_ONE, 0), 0xf800);
+	t2 = makeTri(Vec3(-FX_ONE, 0, FX_ONE), Vec3(0, 0, -1), Vec3(0, 1, 0), 0x07e0);
+	t3 = makeTri(Vec3(FX_ONE, 0, FX_ONE),  Vec3(0, 0, -1), Vec3(0, 1, 0), 0x001f);
 	
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
 	
-	setIdentity(cam);
+	setProjection(cam);
 	
 	screenSize = VgetSize((int)V_MODE);
 	buffers[0] = malloc(screenSize);
@@ -77,21 +77,11 @@ int main()
 		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
 
-		/* clear old stuff from two frames ago 
-		t.verts[0].x = 20 + ((tick - 2) & 0x00ff);
-		t.verts[1].x = 320 - ((tick - 2) & 0x00ff);
-		renderTri(&t, buffers[0], 0x0000);*/
+		multiplyV3ByMat3d(tx.verts[0], t1.verts[0], cam);
+		multiplyV3ByMat3d(tx.verts[1], t1.verts[1], cam);
+		multiplyV3ByMat3d(tx.verts[2], t1.verts[2], cam);
 
-		/* render new stuff 
-		t.verts[0].x = 20 + (tick & 0x00ff);
-		t.verts[1].x = 320 - (tick & 0x00ff);
-		renderTri(&t, buffers[0], 0xf800);*/
-		
-		renderTri(&t1, buffers[0]);
-		renderTri(&t2, buffers[0]);
-		renderTri(&t3, buffers[0]);
-		
-
+	break;
 		if(kbhit())
 		{
 			char c = getch();
@@ -108,6 +98,9 @@ int main()
 	printf("Press a key to continue...\n");
 
 	while(!kbhit());
+
+	tx.verts[0].x = FX_ONE;
+	printf("%i, %il, %il\n", tx.verts[0].x, tx.verts[0].y, tx.verts[0].z);
 
 	free(buffers[0]);
 	free(buffers[1]);
