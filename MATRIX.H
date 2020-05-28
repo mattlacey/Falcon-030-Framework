@@ -10,6 +10,7 @@ void setIdentity(Mat3d m);
 void setProjection(Mat3d m);
 
 void multiplyMat3d(Mat3d out, Mat3d m1, Mat3d m2);
-void multiplyV3ByMat3d(V3 out, V3 v, Mat3d m);
+V3 V3xMat3d(V3 v, Mat3d m);
+V3 V3xMat3dHom(V3 v, Mat3d m);
 
 #endif
