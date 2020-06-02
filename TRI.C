@@ -63,7 +63,7 @@ void renderTri(Tri *pTri, void *pBuffer)
 	renderLine(top->x, top->y, mid->x, mid->y, 0x0cff, pBuffer);
 	renderLine(mid->x, mid->y, bot->x, bot->y, 0xf81f, pBuffer); 
 
-	for(i = top->y; i <= bot->y; i++)
+	for(i = (top->y < 0 ? 0 : top->y); i <= bot->y; i++)
 	{
 		renderSpan(bounds[0][i], bounds[1][i], i, pTri->col, pBuffer);
 	}
@@ -86,7 +86,10 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 	{
 		if(x == x2 && y == y2)
 		{
-			boundBuffer[y + ymod] = x;
+			if(y >= 0)
+			{
+				boundBuffer[y + ymod] = x;
+			}
 			break;
 		}
 		
@@ -100,7 +103,10 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 		
 		if(err2 <= dx)
 		{
-			boundBuffer[y + ymod] = x;
+			if(y >= 0)
+			{
+				boundBuffer[y + ymod] = x;
+			}
 			err += dx;
 			y += sy;
 		}

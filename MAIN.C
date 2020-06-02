@@ -27,7 +27,7 @@ int VgetMode(void)
 
 void printV3(V3 v)
 {
-	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
+	printf("(%ld, %ld, %ld)\n", 160 + (v.x >> 4), 120 + (v.y >> 4), v.z);
 }
 
 int main()
@@ -36,6 +36,7 @@ int main()
 	unsigned long tick = 0;
 	long i;
 	long screenSize;
+	fx32 f1, f2;
 	
 	Tri t1, t2, t3, tx;
 	V3 v1, v2, v3;
@@ -46,11 +47,12 @@ int main()
 	void * buffers[2];
 	void * current;
 
-	#define FX_X (FX_ONE * 10)
+	#define FX_X (FX_ONE * (fx32)100)
+	#define FX_Z (FX_ONE * (fx32)100)
 
-	t1 = makeTri(Vec3(-FX_X, 0, FX_X), Vec3(0, FX_X, FX_X),  Vec3(FX_X, 0, FX_X), 0xf800);
-	t2 = makeTri(Vec3(-FX_X, 0, FX_X), Vec3(0, FX_X, FX_X),  Vec3(FX_X, 0, FX_X), 0x07e0);
-	t3 = makeTri(Vec3(FX_X, 0, FX_X),  Vec3(0, 0, -1), Vec3(0, 1, 0), 0x001f);
+	t1 = makeTri(Vec3(-FX_X, 0, FX_Z), Vec3(0, FX_X, FX_Z),  Vec3(FX_X, 0, 2 * FX_Z), 0xf800);
+	t2 = makeTri(Vec3(-FX_X, 0, FX_Z), Vec3(0, FX_X, FX_Z),  Vec3(FX_X, 0, 2 * FX_Z), 0x07e0);
+	t3 = makeTri(Vec3(FX_X, 0, FX_Z),  Vec3(0, 0, -1), Vec3(0, 1, 0), 0x001f);
 	
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
@@ -84,8 +86,13 @@ int main()
 	
 		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
+		
+		v1 = V3xMat3dHom(t1.verts[0], cam);
+		v2 = V3xMat3dHom(t1.verts[1], cam);
+		v3 = V3xMat3dHom(t1.verts[2], cam);
+		
+		break;
 
-	break;
 		if(kbhit())
 		{
 			char c = getch();
@@ -98,11 +105,6 @@ int main()
 	}
 
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
-	
-/*	printf("Press a key to continue...\n");
-
-	while(!kbhit());
-*/
 
 	v1 = V3xMat3dHom(t1.verts[0], cam);
 	v2 = V3xMat3dHom(t1.verts[1], cam);
@@ -115,13 +117,17 @@ int main()
 	
 	v1 = V3xMat3dHom(t2.verts[0], cam);
 	v2 = V3xMat3dHom(t2.verts[1], cam);
-	v3 = V3xMat3dHom(t3.verts[2], cam);
+	v3 = V3xMat3dHom(t2.verts[2], cam);
 	
 	printf("\n\nTRI 2:\n");
 	printV3(v1);
 	printV3(v2);
 	printV3(v3);
-
+	
+		
+	printf("\n\nPress a key to continue...\n");
+	while(!kbhit());
+	
 	free(buffers[0]);
 	free(buffers[1]);
 

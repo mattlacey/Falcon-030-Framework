@@ -15,6 +15,9 @@ void setProjection(Mat3d m)
     #define FAR (FX_ONE * 1024)
     #define ASPECT_RATIO = 1.3333333;
 
+    /* tan(45 / 2) << 16 */
+    /*#define E (27145)*/
+    #define E FX_ONE
     /* top = near * tan(fov / 2) : tan(45) = 1  */
     #define TOP FX_ONE
     #define BOTTOM (-TOP)
@@ -23,7 +26,7 @@ void setProjection(Mat3d m)
     
 
     /* (2 * FAR) should be 2 * NEAR * FAR but since NEAR is 1 for now, it's easier to skip it */
-    m[0][0] = (FX_ONE / 1.3333333); m[1][0] = 0; m[2][0] = 0; m[3][0] = 0;
+    m[0][0] = (E / 1.3333333); m[1][0] = 0; m[2][0] = 0; m[3][0] = 0;
     m[0][1] = 0; m[1][1] = FX_ONE; m[2][1] = 0; m[3][1] = 0;
     m[0][2] = 0; m[1][2] = 0; m[2][2] = ((NEAR + FAR) / (NEAR - FAR)); m[3][2] = ((2 * FAR) / (NEAR - FAR));
     m[0][3] = 0; m[1][3] = 0; m[2][3] = - FX_ONE; m[3][3] = 0;
@@ -80,7 +83,8 @@ V3 V3xMat3dHom(V3 v, Mat3d m)
     }
     else
     {
-        w = FX_DIV(FX_ONE, w);
+        /*w = FX_RECIPROCAL(w);*/
+        w = FX_ONE;
     }
 
     out.x = FX_MUL(out.x, w);
