@@ -1,9 +1,5 @@
 #include  "tri.h"
 
-#define RED 0xf800
-#define GRN	0xf7f0
-#define BLU	0x001f
-
 Tri makeTri(V3 vec1, V3 vec2, V3 vec3, unsigned col)
 {
 	Tri t;
@@ -12,6 +8,17 @@ Tri makeTri(V3 vec1, V3 vec2, V3 vec3, unsigned col)
 	t.verts[2] = vec3;
 	t.col = col;
 	return t;
+}
+
+void triToScreen(Tri *pTri)
+{
+	pTri->verts[0].x += 160;
+	pTri->verts[1].x += 160;
+	pTri->verts[2].x += 160;
+
+	pTri->verts[0].y += 120;
+	pTri->verts[1].y += 120;
+	pTri->verts[2].y += 120;
 }
 
 void renderTri(Tri *pTri, void *pBuffer)
@@ -23,7 +30,7 @@ void renderTri(Tri *pTri, void *pBuffer)
 	V3 *temp;
 
 	long bounds[2][240];
-	int i;
+	int i, iMin, iMax;
 
 	if(mid->y < top->y)
 	{
@@ -59,11 +66,16 @@ void renderTri(Tri *pTri, void *pBuffer)
 		calcSpanBounds(bounds[0], top->x, top->y, bot->x, bot->y); 
 	}
 
+/*
 	renderLine(top->x, top->y, bot->x, bot->y, 0xffe0, pBuffer);
 	renderLine(top->x, top->y, mid->x, mid->y, 0x0cff, pBuffer);
 	renderLine(mid->x, mid->y, bot->x, bot->y, 0xf81f, pBuffer); 
+*/
 
-	for(i = (top->y < 0 ? 0 : top->y); i <= bot->y; i++)
+	iMin = top->y < 0 ? 0 : top->y;
+	iMax = bot->y >= 240 ? 239 : bot->y;
+
+	for(i = iMin; i < iMax; i++)
 	{
 		renderSpan(bounds[0][i], bounds[1][i], i, pTri->col, pBuffer);
 	}
@@ -78,7 +90,6 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 
 	long dy = - (y1 < y2 ? y2 - y1 : y1 - y2);
 	long sy = (y1 < y2 ? 1 : -1);
-	long ymod = 0;
 	long err = dx + dy;
 	long err2;
 
@@ -86,9 +97,9 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 	{
 		if(x == x2 && y == y2)
 		{
-			if(y >= 0)
+			if(y >= 0 && y < 239)
 			{
-				boundBuffer[y + ymod] = x;
+				boundBuffer[y] = x;
 			}
 			break;
 		}
@@ -103,9 +114,9 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 		
 		if(err2 <= dx)
 		{
-			if(y >= 0)
+			if(y >= 0 && y < 239)
 			{
-				boundBuffer[y + ymod] = x;
+				boundBuffer[y] = x;
 			}
 			err += dx;
 			y += sy;

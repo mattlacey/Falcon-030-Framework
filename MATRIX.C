@@ -79,17 +79,13 @@ V3 V3xMat3dHom(V3 v, Mat3d m)
 
     if(w == 0)
     {
-        w = 1;
-    }
-    else
-    {
-        /*w = FX_RECIPROCAL(w);*/
-        w = FX_ONE;
+        /* FX_DIV shifts the second parameter right by 6 */
+        w = ((fx32)1 << 7);
     }
 
-    out.x = FX_MUL(out.x, w);
-    out.y = FX_MUL(out.y, w);
-    out.z = FX_MUL(out.z, w);
+    out.x = FX_DIV(out.x, w);
+    out.y = FX_DIV(out.y, w);
+    out.z = FX_DIV(out.z, w);
 
     return out;
 }
