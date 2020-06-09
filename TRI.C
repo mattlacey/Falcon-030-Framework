@@ -1,4 +1,7 @@
-#include  "tri.h"
+#include "tri.h"
+#include "framewrk.h"
+
+#include <stdio.h>
 
 Tri makeTri(V3 vec1, V3 vec2, V3 vec3, unsigned col)
 {
@@ -36,14 +39,7 @@ void renderTri(Tri *pTri, void *pBuffer)
 	{
 		temp = top;
 		top = mid;
-		mid = top;
-	}
-	
-	if(bot->y < top->y)
-	{
-		temp = top;
-		top = bot;
-		bot = temp;
+		mid = temp;
 	}
 	
 	if(bot->y < mid->y)
@@ -52,7 +48,15 @@ void renderTri(Tri *pTri, void *pBuffer)
 		bot = mid;
 		mid = temp;
 	}
-	
+
+	if(mid->y < top->y)
+	{
+		temp = top;
+		top = mid;
+		mid = temp;
+	}
+
+	/* Is this correct? Do we only need to consider two cases? It's been a while... */
 	if(mid->x <= bot->x)
 	{
 		calcSpanBounds(bounds[0], top->x, top->y, mid->x, mid->y); 
@@ -66,19 +70,21 @@ void renderTri(Tri *pTri, void *pBuffer)
 		calcSpanBounds(bounds[0], top->x, top->y, bot->x, bot->y); 
 	}
 
-/*
-	renderLine(top->x, top->y, bot->x, bot->y, 0xffe0, pBuffer);
-	renderLine(top->x, top->y, mid->x, mid->y, 0x0cff, pBuffer);
-	renderLine(mid->x, mid->y, bot->x, bot->y, 0xf81f, pBuffer); 
-*/
-
+#ifdef FILL
 	iMin = top->y < 0 ? 0 : top->y;
 	iMax = bot->y >= 240 ? 239 : bot->y;
-
 	for(i = iMin; i < iMax; i++)
 	{
 		renderSpan(bounds[0][i], bounds[1][i], i, pTri->col, pBuffer);
 	}
+#endif
+
+#ifdef WIREFRAME
+	renderLine(top->x, top->y, bot->x, bot->y, 0xffe0, pBuffer);
+	renderLine(top->x, top->y, mid->x, mid->y, 0x0cff, pBuffer);
+	renderLine(mid->x, mid->y, bot->x, bot->y, 0xf81f, pBuffer); 
+#endif
+
 }
 
 void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
