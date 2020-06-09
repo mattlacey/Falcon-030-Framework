@@ -27,20 +27,25 @@ int VgetMode(void)
 
 void printV3(V3 v)
 {
-	printf("(%ld, %ld, %ld)\n", 160 + v.x, 120 + v.y, v.z);
+	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
 }
 
-void drawTri(Tri t, Mat3d cam, void *pBuffer)
+void drawTri(Tri *t, Mat3d cam, void *pBuffer)
 {
 	V3 v1, v2, v3;
 	Tri tx;
 
-	v1 = V3xMat3dHom(t.verts[0], cam);
-	v2 = V3xMat3dHom(t.verts[1], cam);
-	v3 = V3xMat3dHom(t.verts[2], cam);
+	v1 = V3xMat3dHom(t->verts[0], cam);
+	v2 = V3xMat3dHom(t->verts[1], cam);
+	v3 = V3xMat3dHom(t->verts[2], cam);
 
-	tx = makeTri(v1, v2, v3, t.col);
-	triToScreen(&tx);		
+	tx = makeTri(v1, v2, v3, t->col);
+	triToScreen(&tx);
+	
+	printV3(tx.verts[0]);
+	printV3(tx.verts[1]);
+	printV3(tx.verts[2]);
+	printf("\n----\n");
 	renderTri(&tx, pBuffer);
 }
 
@@ -62,11 +67,11 @@ int main()
 	void * current;
 
 	#define FX_X (FX_ONE * (fx32)50)
-	#define FX_Y (FX_ONE * (fx32)25)
+	#define FX_Y (FX_ONE * (fx32)20)
 	#define FX_Z (- FX_ONE * (fx32)100)
 
 	t1 = makeTri(Vec3(-FX_X, 0, FX_Z), Vec3(0, FX_Y, FX_Z),  Vec3(FX_X, 0, 4 * FX_Z), 0xf800);
-	t2 = makeTri(Vec3(-FX_X, - FX_Y, FX_Z), Vec3(0, 0, FX_Z),  Vec3(FX_X, - FX_Y, FX_Z), 0x07e0);
+	t2 = makeTri(Vec3(-FX_X, FX_Y, FX_Z), Vec3(0, 0, FX_Z),  Vec3(FX_X, FX_Y, 4 * FX_Z), 0x07e0);
 	t3 = makeTri(Vec3(FX_X, 0, FX_Z),  Vec3(0, 0, -1), Vec3(0, 1, 0), 0x001f);
 	
 	prevLogBase = Logbase();
@@ -102,8 +107,12 @@ int main()
 		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
 		
-		drawTri(t1, cam, current);
-		drawTri(t2, cam, current);
+		drawTri(&t1, cam, current);
+		drawTri(&t2, cam, current);
+
+		/* This fails to render, but why? */		
+		tx = makeTri(Vec3(64, 171, 0), Vec3(160, 120, 0), Vec3(184, 132, 0), BLU);
+		renderTri(&tx, current);
 
 		if(kbhit())
 		{
@@ -131,10 +140,13 @@ int main()
 	v2 = V3xMat3dHom(t2.verts[1], cam);
 	v3 = V3xMat3dHom(t2.verts[2], cam);
 	
+	tx = makeTri(v1, v2, v3, 0xff00);
+	triToScreen(&tx);
+	
 	printf("\n\nTRI 2:\n");
-	printV3(v1);
-	printV3(v2);
-	printV3(v3);
+	printV3(tx.verts[0]);
+	printV3(tx.verts[1]);
+	printV3(tx.verts[2]);
 	
 		
 	printf("\n\nPress a key to continue...\n");
