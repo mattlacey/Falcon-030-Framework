@@ -4,6 +4,7 @@
 #include <tos.h>
 #include <ext.h>
 
+#include "fx.h"
 #include "framewrk.h"
 #include "tri.h"
 #include "matrix.h"
@@ -76,6 +77,9 @@ int main()
 	t2 = makeTri(Vec3(-FX_X, 0, FX_Z), Vec3(0, - FX_Y, FX_Z),  Vec3(FX_X, 0, 2 * FX_Z), 0x07e0);
 	t3 = makeTri(Vec3(FX_X, 0, FX_Z),  Vec3(0, 0, -1), Vec3(0, 1, 0), 0x001f);
 
+
+	initTables();
+/*
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
 
@@ -97,7 +101,6 @@ int main()
 
 	xbios(5, buffers[1], buffers[0], 3, (int)V_MODE);
 
-	/* this buffer gets trashed by VSetscreen so clear here */
 	memset(buffers[1], 0x00, screenSize);
 	current = buffers[1];
 
@@ -127,27 +130,12 @@ int main()
 	}
 
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
+*/
 
-	v1 = V3xMat3dHom(t1.verts[0], cam);
-	v2 = V3xMat3dHom(t1.verts[1], cam);
-	v3 = V3xMat3dHom(t1.verts[2], cam);
-
-	printf("TRI 1:\n");
-	printV3(v1);
-	printV3(v2);
-	printV3(v3);
-
-	v1 = V3xMat3dHom(t2.verts[0], cam);
-	v2 = V3xMat3dHom(t2.verts[1], cam);
-	v3 = V3xMat3dHom(t2.verts[2], cam);
-	
-	tx = makeTri(v1, v2, v3, 0xff00);
-	triToScreen(&tx);
-	
-	printf("\n\nTRI 2:\n");
-	printV3(tx.verts[0]);
-	printV3(tx.verts[1]);
-	printV3(tx.verts[2]);
+	for(i = 0; i < 360; i += 15)
+	{
+		printf("%ld: %ld, %ld\n", i, sinTable[i], cosTable[i]);
+	}
 
 	printf("\n\nPress a key to continue...\n");
 	while(!kbhit());

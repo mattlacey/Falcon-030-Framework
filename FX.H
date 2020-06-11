@@ -14,5 +14,10 @@ typedef long fx32;
 
 #define FX_RECIPROCAL(a) (((fx32)1 << 30) / (a << 2))
 
+extern fx32 sinTable[360];
+extern fx32 cosTable[360];
+
+void initTables(void);
+
 #endif
 
