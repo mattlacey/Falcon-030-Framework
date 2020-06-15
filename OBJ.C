@@ -36,7 +36,7 @@ Obj makeCube(void)
     o.indices[9] = 7; o.indices[10] = 4; o.indices[11] = 6;
 
     o.col = RED;
-    o.pos = Vec3(0, 0, - FX_ONE * 100);
+    o.pos = Vec3(0, 0, - FX_ONE * 150);
     setIdentity(o.mat);
 
     return o;
@@ -52,9 +52,13 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 
     for(i = 0; i < o.indexCount; i+= 3)
     {
-        v1 = AddVec3(o.verts[o.indices[i]], o.pos);
-        v2 = AddVec3(o.verts[o.indices[i + 1]], o.pos);
-        v3 = AddVec3(o.verts[o.indices[i + 2]], o.pos);
+        v1 = V3xMat3d(o.verts[o.indices[i + 0]], o.mat);
+        v2 = V3xMat3d(o.verts[o.indices[i + 1]], o.mat);
+        v3 = V3xMat3d(o.verts[o.indices[i + 2]], o.mat);
+
+        v1 = AddVec3(v1, o.pos);
+        v2 = AddVec3(v2, o.pos);
+        v3 = AddVec3(v3, o.pos);
 
         v1 = V3xMat3dHom(v1, cam);
         v2 = V3xMat3dHom(v2, cam);

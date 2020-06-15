@@ -36,7 +36,7 @@ int main()
 {
 	int prevMode;
 	unsigned long tick = 0;
-	long i;
+	long i = 0;
 	long screenSize;
 
 	Mat3d cam;
@@ -87,6 +87,16 @@ int main()
 		Vsync();
 
 		renderObject(o, cam, current);
+
+		i ++;
+
+		if(i == 360)
+		{
+			i = 0;
+		}
+
+		/*setRotY(obj.mat, i);*/
+		o.pos.z = -FX_ONE * 150 - (i << FX_SHIFT);
 
 		if(kbhit())
 		{
