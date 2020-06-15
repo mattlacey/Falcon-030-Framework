@@ -18,5 +18,6 @@ typedef struct
 } Obj;
 
 Obj makeCube(void);
+void renderObject(Obj o, Mat3d cam, void* pBuffer);
 
 #endif

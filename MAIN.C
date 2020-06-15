@@ -32,52 +32,21 @@ void printV3(V3 v)
 	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
 }
 
-void drawTri(Tri *t, Mat3d cam, void *pBuffer)
-{
-	V3 v1, v2, v3;
-	Tri tx;
-
-	v1 = V3xMat3dHom(t->verts[0], cam);
-	v2 = V3xMat3dHom(t->verts[1], cam);
-	v3 = V3xMat3dHom(t->verts[2], cam);
-
-	tx = makeTri(v1, v2, v3, t->col);
-	triToScreen(tx);
-
-/*	
-	printV3(tx.verts[0]);
-	printV3(tx.verts[1]);
-	printV3(tx.verts[2]);
-	printf("\n----\n");
-*/
-	renderTri(tx, pBuffer);
-}
-
 int main()
 {
 	int prevMode;
 	unsigned long tick = 0;
 	long i;
 	long screenSize;
-	fx32 f1, f2;
 
-	Tri t1, t2, t3, tx;
-	V3 v1, v2, v3;
 	Mat3d cam;
+
+	Obj o;
 
 	void * prevLogBase;
 	void * prevPhyBase;
 	void * buffers[2];
 	void * current;
-
-	#define FX_X (FX_ONE * (fx32)50)
-	#define FX_Y (FX_ONE * (fx32)20)
-	#define FX_Z (- FX_ONE * (fx32)100)
-
-	t1 = makeTri(Vec3(-FX_X, 0, FX_Z), Vec3(0, FX_Y, FX_Z),  Vec3(FX_X, 0, 4 * FX_Z), 0xf800);
-	t2 = makeTri(Vec3(-FX_X, 0, FX_Z), Vec3(0, - FX_Y, FX_Z),  Vec3(FX_X, 0, 2 * FX_Z), 0x07e0);
-	t3 = makeTri(Vec3(FX_X, 0, FX_Z),  Vec3(0, 0, -1), Vec3(0, 1, 0), 0x001f);
-
 
 	initTables();
 
@@ -85,6 +54,7 @@ int main()
 	prevPhyBase = Physbase();
 
 	setProjection(cam);
+	o = makeCube();
 
 	screenSize = VgetSize((int)V_MODE);
 	buffers[0] = malloc(screenSize);
@@ -116,8 +86,7 @@ int main()
 		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
 
-		drawTri(&t1, cam, current);
-		drawTri(&t2, cam, current);
+		renderObject(o, cam, current);
 
 		if(kbhit())
 		{

@@ -13,15 +13,15 @@ Tri makeTri(V3 vec1, V3 vec2, V3 vec3, unsigned col)
 	return t;
 }
 
-void triToScreen(Tri t)
+void triToScreen(Tri *pTri)
 {
-	t.verts[0].x += 160;
-	t.verts[1].x += 160;
-	t.verts[2].x += 160;
+	pTri->verts[0].x += 160;
+	pTri->verts[1].x += 160;
+	pTri->verts[2].x += 160;
 
-	t.verts[0].y += 120;
-	t.verts[1].y += 120;
-	t.verts[2].y += 120;
+	pTri->verts[0].y += 120;
+	pTri->verts[1].y += 120;
+	pTri->verts[2].y += 120;
 }
 
 void renderTri(Tri t, void *pBuffer)
