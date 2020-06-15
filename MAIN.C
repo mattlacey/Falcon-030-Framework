@@ -8,6 +8,7 @@
 #include "framewrk.h"
 #include "tri.h"
 #include "matrix.h"
+#include "obj.h"
 
 #define DEBUG	0
 
@@ -41,7 +42,7 @@ void drawTri(Tri *t, Mat3d cam, void *pBuffer)
 	v3 = V3xMat3dHom(t->verts[2], cam);
 
 	tx = makeTri(v1, v2, v3, t->col);
-	triToScreen(&tx);
+	triToScreen(tx);
 
 /*	
 	printV3(tx.verts[0]);
@@ -49,7 +50,7 @@ void drawTri(Tri *t, Mat3d cam, void *pBuffer)
 	printV3(tx.verts[2]);
 	printf("\n----\n");
 */
-	renderTri(&tx, pBuffer);
+	renderTri(tx, pBuffer);
 }
 
 int main()
@@ -79,7 +80,7 @@ int main()
 
 
 	initTables();
-/*
+
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
 
@@ -130,7 +131,6 @@ int main()
 	}
 
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
-*/
 
 	for(i = 0; i < 360; i += 15)
 	{

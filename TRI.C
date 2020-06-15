@@ -13,20 +13,20 @@ Tri makeTri(V3 vec1, V3 vec2, V3 vec3, unsigned col)
 	return t;
 }
 
-void triToScreen(Tri *pTri)
+void triToScreen(Tri t)
 {
-	pTri->verts[0].x += 160;
-	pTri->verts[1].x += 160;
-	pTri->verts[2].x += 160;
+	t.verts[0].x += 160;
+	t.verts[1].x += 160;
+	t.verts[2].x += 160;
 
-	pTri->verts[0].y += 120;
-	pTri->verts[1].y += 120;
-	pTri->verts[2].y += 120;
+	t.verts[0].y += 120;
+	t.verts[1].y += 120;
+	t.verts[2].y += 120;
 }
 
-void renderTri(Tri *pTri, void *pBuffer)
+void renderTri(Tri t, void *pBuffer)
 {
-	V3 *verts = pTri->verts;
+	V3 *verts = t.verts;
 	V3 *top = &verts[0];
 	V3 *mid = &verts[1];
 	V3 *bot = &verts[2];
@@ -75,7 +75,7 @@ void renderTri(Tri *pTri, void *pBuffer)
 	iMax = bot->y >= 240 ? 239 : bot->y;
 	for(i = iMin; i < iMax; i++)
 	{
-		renderSpan(bounds[0][i], bounds[1][i], i, pTri->col, pBuffer);
+		renderSpan(bounds[0][i], bounds[1][i], i, t.col, pBuffer);
 	}
 #endif
 

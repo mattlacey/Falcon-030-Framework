@@ -6,6 +6,7 @@ FX.C
 TRI.C
 VECTOR.C
 MATRIX.C
+OBJ.C
 pcstdlib.lib
 pcextlib.lib
 pctoslib.lib
