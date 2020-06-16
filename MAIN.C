@@ -7,7 +7,7 @@
 #include "fx.h"
 #include "framewrk.h"
 #include "tri.h"
-#include "matrix.h"
+#include "matrix.h"	
 #include "obj.h"
 
 #define DEBUG	0
@@ -54,7 +54,11 @@ int main()
 	prevPhyBase = Physbase();
 
 	setProjection(cam);
+
+	o = loadObj("DATA/SQUARE.OBJ");
 	o = makeCube();
+
+#ifdef RUN_ENGINE
 
 	screenSize = VgetSize((int)V_MODE);
 	buffers[0] = malloc(screenSize);
@@ -111,10 +115,7 @@ int main()
 
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
 
-	for(i = 0; i < 360; i += 15)
-	{
-		printf("%ld: %ld, %ld\n", i, sinTable[i], cosTable[i]);
-	}
+#endif
 
 	printf("\n\nPress a key to continue...\n");
 	while(!kbhit());

@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "OBJ.H"
 #include "FRAMEWRK.H"
@@ -38,6 +40,69 @@ Obj makeCube(void)
     o.col = RED;
     o.pos = Vec3(0, 0, - FX_ONE * 150);
     setIdentity(o.mat);
+
+    return o;
+}
+
+Obj loadObj(char * filename)
+{
+    FILE* f;
+    int cursor = 0;
+    Obj o;
+    char input[128];
+    char line[128];
+    double v1, v2, v3;
+    o.vertCount = 0;
+    o.indexCount = 0;
+
+    f = fopen(filename, "r");
+
+    if(f == NULL)
+    {
+        return o;
+    }
+
+    /* grab the vertex and face counts */
+    while(fgets(input, sizeof input, f))
+    {
+        sscanf(input, "%s", input);
+
+        if(strcmp(input, "v") == 0)
+        {
+            o.vertCount++;
+        }
+        else if(strcmp(input, "f") == 0)
+        {
+            /* each face uses 3 indices... need to switch to storing triangles */
+            o.indexCount += 3;
+        }
+    }
+
+    fseek(f, 0, SEEK_SET);
+
+    o.verts = malloc(sizeof(V3) * o.vertCount);
+    o.indices = malloc(sizeof(long) * o.indexCount);
+
+    while(1)
+    {
+        if(!fgets(input, sizeof input, f))
+            break;
+
+        if(strcmp(input, "v") == 0)
+        {
+            printf("bob");
+            fscanf(f, "%lf %lf %lf\n", &v1, &v2, &v3);
+            printf("%ld %ld %ld\n", (fx32)(v1 * (float)FX_ONE), (fx32)(v2 * FX_ONE), (fx32)(v3 * FX_ONE));
+        }
+        else
+        {
+            fscanf(f, "%s\n", input);
+           /* printf("%s\n", line); */
+        }
+    }
+
+    printf("Verts: %ld, Indices: %ld\n", o.vertCount, o.indexCount);
+    fclose(f);
 
     return o;
 }
