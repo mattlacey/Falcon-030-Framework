@@ -6,8 +6,8 @@
 #define BLU	0x001f
 
 #define WIREFRAME (1)
-#define FILL (1)
+/*#define FILL (1)*/
 
-/*#define RUN_ENGINE (1)*/
+#define RUN_ENGINE (1)
 
 #endif

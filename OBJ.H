@@ -18,6 +18,7 @@ typedef struct
 } Obj;
 
 Obj makeCube(void);
+void loadTest(void);
 Obj loadObj(char * filename);
 void renderObject(Obj o, Mat3d cam, void* pBuffer);
 

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "OBJ.H"
 #include "FRAMEWRK.H"
@@ -44,6 +45,28 @@ Obj makeCube(void)
     return o;
 }
 
+void loadTest()
+{
+    FILE* f;
+    double v;
+    char buffer[255];
+    char floats[4][255];
+
+    f = fopen("DATA/TEST.OBJ", "r");
+
+    if(f)
+    {
+        printf("Opened file\n");
+        while(fgets(buffer, sizeof buffer, f))
+        {
+            sscanf(buffer, "%s", floats[0]);
+            printf("Found: %ld in %s\n", (fx32)(FX_ONE * atof(floats[0])), buffer);
+        }
+
+        fclose(f);
+    }
+}
+
 Obj loadObj(char * filename)
 {
     FILE* f;
@@ -51,6 +74,7 @@ Obj loadObj(char * filename)
     Obj o;
     char input[128];
     char line[128];
+    char floats[4][32];
     double v1, v2, v3;
     o.vertCount = 0;
     o.indexCount = 0;
@@ -83,22 +107,21 @@ Obj loadObj(char * filename)
     o.verts = malloc(sizeof(V3) * o.vertCount);
     o.indices = malloc(sizeof(long) * o.indexCount);
 
-    while(1)
+    while(fgets(line, sizeof line, f))
     {
-        if(!fgets(input, sizeof input, f))
-            break;
+        sscanf(line, "%s", input);
 
         if(strcmp(input, "v") == 0)
         {
-            printf("bob");
-            fscanf(f, "%lf %lf %lf\n", &v1, &v2, &v3);
-            printf("%ld %ld %ld\n", (fx32)(v1 * (float)FX_ONE), (fx32)(v2 * FX_ONE), (fx32)(v3 * FX_ONE));
+            sscanf(line, "%*s %s %s %s", floats[0], floats[1], floats[2]);
+            printf("%ld %ld %ld\n", (fx32)(atof(floats[0]) * FX_ONE), (fx32)(atof(floats[1]) * FX_ONE), (fx32)(atof(floats[2]) * FX_ONE));
         }
+        /*
         else
         {
-            fscanf(f, "%s\n", input);
-           /* printf("%s\n", line); */
+            printf("%s\n", line);
         }
+        */
     }
 
     printf("Verts: %ld, Indices: %ld\n", o.vertCount, o.indexCount);

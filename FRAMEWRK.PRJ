@@ -10,4 +10,4 @@ OBJ.C
 pcstdlib.lib
 pcextlib.lib
 pctoslib.lib
-pcfltlib.lib
+tcfltlib.lib

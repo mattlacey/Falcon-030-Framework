@@ -54,9 +54,7 @@ int main()
 	prevPhyBase = Physbase();
 
 	setProjection(cam);
-
 	o = loadObj("DATA/SQUARE.OBJ");
-	o = makeCube();
 
 #ifdef RUN_ENGINE
 
@@ -100,7 +98,7 @@ int main()
 		}
 
 		/*setRotY(obj.mat, i);*/
-		o.pos.z = -FX_ONE * 150 - (i << FX_SHIFT);
+		/*o.pos.z = -FX_ONE * 150 - (i << FX_SHIFT);*/
 
 		if(kbhit())
 		{
