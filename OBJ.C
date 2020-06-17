@@ -52,7 +52,7 @@ void loadTest()
     char buffer[255];
     char floats[4][255];
 
-    f = fopen("DATA/TEST.OBJ", "r");
+    f = fopen("DATA/TEST.TXT", "r");
 
     if(f)
     {
@@ -70,12 +70,17 @@ void loadTest()
 Obj loadObj(char * filename)
 {
     FILE* f;
-    int cursor = 0;
+    int currentVert = 0;
+    int currentIndex = 0;
+    int scanCount = 0;
     Obj o;
     char input[128];
     char line[128];
     char floats[4][32];
-    double v1, v2, v3;
+    long indices[3];
+
+    setIdentity(o.mat);
+    o.pos = Vec3(0, 0, 0);
     o.vertCount = 0;
     o.indexCount = 0;
 
@@ -114,18 +119,46 @@ Obj loadObj(char * filename)
         if(strcmp(input, "v") == 0)
         {
             sscanf(line, "%*s %s %s %s", floats[0], floats[1], floats[2]);
-            printf("%ld %ld %ld\n", (fx32)(atof(floats[0]) * FX_ONE), (fx32)(atof(floats[1]) * FX_ONE), (fx32)(atof(floats[2]) * FX_ONE));
+            o.verts[currentVert].x = (fx32)(atof(floats[0]) * FX_ONE);
+            o.verts[currentVert].y = (fx32)(atof(floats[1]) * FX_ONE);
+            o.verts[currentVert].z = (fx32)(atof(floats[2]) * FX_ONE);
+            currentVert++;
         }
-        /*
-        else
+        else if(strcmp(input, "f") == 0)
         {
-            printf("%s\n", line);
+            /* try vert/tex/normal format first */
+            scanCount = sscanf(line, "%*s %ld/%*s %ld/%*s %ld/%*s", &indices[0], &indices[1], &indices[2]);
+
+            if(scanCount == 1)
+            {
+                scanCount = sscanf(line, "%*s %ld %ld %ld", &indices[0], &indices[1], &indices[2]);
+            }
+
+            /* for some reason indices are not zero based */
+            o.indices[currentIndex] = indices[0] - 1;
+            o.indices[currentIndex + 1] = indices[1] - 1;
+            o.indices[currentIndex + 2] = indices[2] - 1;
+            currentIndex += 3;
         }
-        */
     }
 
-    printf("Verts: %ld, Indices: %ld\n", o.vertCount, o.indexCount);
     fclose(f);
+
+#ifndef RUN_ENGINE
+    printf("Verts: %ld, Indices: %ld\n", o.vertCount, o.indexCount);
+
+    for(currentVert = 0; currentVert < o.vertCount; currentVert++)
+    {
+        printf("%ld,%ld,%ld\n", o.verts[currentVert].x, o.verts[currentVert].y, o.verts[currentVert].z);
+    }
+
+    printf("\nFaces:\n\n");
+
+    for(currentVert = 0; currentVert < o.indexCount; currentVert += 3)
+    {
+        printf("%ld - %ld - %ld\n", o.indices[currentVert], o.indices[currentVert + 1], o.indices[currentVert + 2]);
+    }
+#endif
 
     return o;
 }
@@ -134,7 +167,7 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 {
     int i = 0;
     Tri tx;
-    V3 v1, v2, v3, sv1, sv2, sv3;
+    V3 v1, v2, v3;
 
     /* Should transform all verts first, but for now we're going dumb */
 

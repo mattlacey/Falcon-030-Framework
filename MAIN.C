@@ -7,7 +7,7 @@
 #include "fx.h"
 #include "framewrk.h"
 #include "tri.h"
-#include "matrix.h"	
+#include "matrix.h"
 #include "obj.h"
 
 #define DEBUG	0
@@ -35,6 +35,8 @@ void printV3(V3 v)
 int main()
 {
 	int prevMode;
+	int maxIndices;
+	unsigned col = 0;
 	unsigned long tick = 0;
 	long i = 0;
 	long screenSize;
@@ -54,7 +56,10 @@ int main()
 	prevPhyBase = Physbase();
 
 	setProjection(cam);
-	o = loadObj("DATA/SQUARE.OBJ");
+	o = loadObj("DATA/TEAPOT.OBJ");
+	o.pos = Vec3(0, 0, FX_ONE * 200);
+	maxIndices = o.indexCount;
+	/*o.indexCount = 0;*/
 
 #ifdef RUN_ENGINE
 
@@ -106,6 +111,12 @@ int main()
 
 			if(c == 'q')
 				break;
+
+			if(c == 'p' && o.indexCount >= 3)
+				o.indexCount -= 3;
+			else if(c == 'o' && o.indexCount < maxIndices - 3)
+				o.indexCount += 3;
+
 		}
 
 		tick++;
