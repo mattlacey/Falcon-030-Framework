@@ -7,14 +7,14 @@
 
 typedef struct
 {
-    V3 * verts;
-    long vertCount;
-    long * indices;
-    long indexCount;
+	V3 * verts;
+	long vertCount;
+	long * indices;
+	long indexCount;
 
-    V3 pos;
-    Mat3d mat;
-    unsigned col;
+	V3 pos;
+	Mat3d mat;
+	unsigned col;
 } Obj;
 
 Obj makeCube(void);
