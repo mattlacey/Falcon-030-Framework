@@ -5,15 +5,20 @@ A basic C Framework / 3D engine for the Atari Falcon
 
 ## Vector Arithmetic
 
-- [ ] Cross Product
-- [ ] Dot Product
-- [ ] Subtraction
+- [x] Cross Product
+- [x] Dot Product
+- [x] Subtraction
 - [ ] Scalar Multiplication
 
 ## Matrices
 
 - [ ] Fix rotations
 - [ ] Vector to matrix
+
+## Lights
+
+- [ ] Point lights
+- [ ] Directional lights
 
 ## Camera
 

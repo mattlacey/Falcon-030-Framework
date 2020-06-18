@@ -9,6 +9,9 @@ typedef struct Vector3
 } V3;
 
 V3 Vec3(long x, long y, long z);
-V3 AddVec3(V3 a, V3 b);
+
+V3 addVec3(V3 a, V3 b);
+V3 subVec3(V3 a, V3 b);
+V3 cross(V3 a, V3 b);
 
 #endif
