@@ -4,8 +4,11 @@
 #include <tos.h>
 #include <ext.h>
 
+#include "fx.h"
 #include "framewrk.h"
 #include "tri.h"
+#include "matrix.h"
+#include "obj.h"
 
 #define DEBUG	0
 
@@ -24,28 +27,42 @@ int VgetMode(void)
 	return xbios(88, (int)-1);
 }
 
-int main(int argc, char ** argv)
+void printV3(V3 v)
+{
+	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
+}
+
+int main()
 {
 	int prevMode;
+	int maxIndices;
+	unsigned col = 0;
 	unsigned long tick = 0;
-	long i;
+	long i = 0;
 	long screenSize;
-	
-	Tri t1, t2, t3;
+
+	Mat3d cam;
+
+	Obj o;
 
 	void * prevLogBase;
 	void * prevPhyBase;
 	void * buffers[2];
 	void * current;
 
-	t1 = makeTri(Vec3(20, 20, 0), Vec3(80, 20, 0), Vec3(30, 80, 0), 0xf800);
-	t2 = makeTri(Vec3(120, 20, 0), Vec3(200, 100, 0), Vec3(140, 150, 0), 0x07e0);
-	/* Change this second vector back to (200, 230, 0) */
-	t3 = makeTri(Vec3(80, 160, 0), Vec3(40, 230, 0), Vec3(300, 230, 0), 0x001f);
-	
+	initTables();
+
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
-	
+
+	setProjection(cam);
+	o = loadObj("DATA/TEAPOT.OBJ");
+	o.pos = Vec3(0, 0, FX_ONE * 200);
+	maxIndices = o.indexCount;
+	/*o.indexCount = 0;*/
+
+#ifdef RUN_ENGINE
+
 	screenSize = VgetSize((int)V_MODE);
 	buffers[0] = malloc(screenSize);
 	buffers[1] = malloc(screenSize);
@@ -57,12 +74,14 @@ int main(int argc, char ** argv)
 	}
 
 	memset(buffers[0], 0x00, screenSize);
-	
+
 	prevMode = VgetMode();
+
 	xbios(5, buffers[1], buffers[0], 3, (int)V_MODE);
 
-	/* this buffer gets trashed by VSetscreen so clear here */
 	memset(buffers[1], 0x00, screenSize);
+	current = buffers[1];
+
 	xbios(5, buffers[1], buffers[1], -1);
 
 	while(1)
@@ -70,40 +89,44 @@ int main(int argc, char ** argv)
 		current = buffers[1];
 		buffers[1] = buffers[0];
 		buffers[0] = current;
-	
+
 		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
 
-		/* clear old stuff from two frames ago 
-		t.verts[0].x = 20 + ((tick - 2) & 0x00ff);
-		t.verts[1].x = 320 - ((tick - 2) & 0x00ff);
-		renderTri(&t, buffers[0], 0x0000);*/
+		renderObject(o, cam, current);
 
-		/* render new stuff 
-		t.verts[0].x = 20 + (tick & 0x00ff);
-		t.verts[1].x = 320 - (tick & 0x00ff);
-		renderTri(&t, buffers[0], 0xf800);*/
-		
-		renderTri(&t1, buffers[0]);
-		renderTri(&t2, buffers[0]);
-		renderTri(&t3, buffers[0]);
-		
+		i ++;
+
+		if(i == 360)
+		{
+			i = 0;
+		}
+
+		/*setRotY(obj.mat, i);*/
+		/*o.pos.z = -FX_ONE * 150 - (i << FX_SHIFT);*/
 
 		if(kbhit())
 		{
 			char c = getch();
-			
+
 			if(c == 'q')
 				break;
+
+			if(c == 'p' && o.indexCount >= 3)
+				o.indexCount -= 3;
+			else if(c == 'o' && o.indexCount < maxIndices - 3)
+				o.indexCount += 3;
+
 		}
-		
+
 		tick++;
 	}
 
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
-	
-	printf("Press a key to continue...\n");
 
+#endif
+
+	printf("\n\nPress a key to continue...\n");
 	while(!kbhit());
 
 	free(buffers[0]);

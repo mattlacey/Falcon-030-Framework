@@ -2,8 +2,12 @@ framewrk.prg
 =
 pcstart.o
 * (framewrk.h)
+FX.C
 TRI.C
 VECTOR.C
+MATRIX.C
+OBJ.C
 pcstdlib.lib
 pcextlib.lib
 pctoslib.lib
+tcfltlib.lib
