@@ -32,16 +32,29 @@ void printV3(V3 v)
 	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
 }
 
+void renderBG(void *pBuffer)
+{
+	unsigned int col = 0;
+	long i;
+	long res = 320 * 240;
+
+	for(i = 0; i < res; i++)
+	{
+		*((unsigned int *)pBuffer + i) = col;
+	}
+}
+
 int main()
 {
 	int prevMode;
-	int maxIndices;
-	unsigned col = 0;
+	long maxIndices;
 	unsigned long tick = 0;
 	long i = 0;
 	long screenSize;
 
 	Mat3d cam;
+	Mat3d rotZ;
+	Mat3d rotY;
 
 	Obj o;
 
@@ -56,8 +69,15 @@ int main()
 	prevPhyBase = Physbase();
 
 	setProjection(cam);
+
+#ifdef CUBE
+	o = loadObj("DATA/CUBE.OBJ");
+	o.pos = Vec3(0, 0, FX_ONE * 5);
+#else
 	o = loadObj("DATA/TEAPOT.OBJ");
 	o.pos = Vec3(0, 0, FX_ONE * 200);
+#endif
+
 	maxIndices = o.indexCount;
 	/*o.indexCount = 0;*/
 
@@ -93,17 +113,20 @@ int main()
 		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
 
+	/*	renderBG(current); */
+		memset(current, 0x00, screenSize);
 		renderObject(o, cam, current);
 
-		i ++;
+		i += 2;
 
 		if(i == 360)
 		{
 			i = 0;
 		}
 
-		/*setRotY(obj.mat, i);*/
-		/*o.pos.z = -FX_ONE * 150 - (i << FX_SHIFT);*/
+		setRotZ(rotZ, i);
+		setRotY(rotY, i);
+		multiplyMat3d(o.mat, rotZ, rotY);
 
 		if(kbhit())
 		{

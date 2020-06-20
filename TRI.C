@@ -41,7 +41,7 @@ void renderTri(Tri t, void *pBuffer)
 		top = mid;
 		mid = temp;
 	}
-	
+
 	if(bot->y < mid->y)
 	{
 		temp = bot;
@@ -59,15 +59,15 @@ void renderTri(Tri t, void *pBuffer)
 	/* Is this correct? Do we only need to consider two cases? It's been a while... */
 	if(mid->x <= bot->x)
 	{
-		calcSpanBounds(bounds[0], top->x, top->y, mid->x, mid->y); 
-		calcSpanBounds(bounds[0], mid->x, mid->y, bot->x, bot->y); 
-		calcSpanBounds(bounds[1], top->x, top->y, bot->x, bot->y); 
+		calcSpanBounds(bounds[0], top->x, top->y, mid->x, mid->y);
+		calcSpanBounds(bounds[0], mid->x, mid->y, bot->x, bot->y);
+		calcSpanBounds(bounds[1], top->x, top->y, bot->x, bot->y);
 	}
 	else
 	{
-		calcSpanBounds(bounds[1], top->x, top->y, mid->x, mid->y); 
-		calcSpanBounds(bounds[1], mid->x, mid->y, bot->x, bot->y); 
-		calcSpanBounds(bounds[0], top->x, top->y, bot->x, bot->y); 
+		calcSpanBounds(bounds[1], top->x, top->y, mid->x, mid->y);
+		calcSpanBounds(bounds[1], mid->x, mid->y, bot->x, bot->y);
+		calcSpanBounds(bounds[0], top->x, top->y, bot->x, bot->y);
 	}
 
 #ifdef FILL
@@ -82,7 +82,7 @@ void renderTri(Tri t, void *pBuffer)
 #ifdef WIREFRAME
 	renderLine(top->x, top->y, bot->x, bot->y, 0xffe0, pBuffer);
 	renderLine(top->x, top->y, mid->x, mid->y, 0x0cff, pBuffer);
-	renderLine(mid->x, mid->y, bot->x, bot->y, 0xf81f, pBuffer); 
+	renderLine(mid->x, mid->y, bot->x, bot->y, 0xf81f, pBuffer);
 #endif
 
 }
@@ -109,15 +109,15 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 			}
 			break;
 		}
-		
+
 		err2 = 2 * err;
-		
+
 		if(err2 >= dy)
 		{
 			err += dy;
 			x += sx;
 		}
-		
+
 		if(err2 <= dx)
 		{
 			if(y >= 0 && y < 239)
@@ -133,7 +133,7 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 void renderSpan(long x1, long x2, long y, unsigned col, void *pBuffer)
 {
 	long i;
-	
+
 	for(i = x1; i < x2; i++)
 	{
 		*((unsigned int*)pBuffer + i + (y * (long)320)) = col;
@@ -152,24 +152,27 @@ void renderLine(long x1, long y1, long x2, long y2, unsigned col, void *pBuffer)
 	long err = dx + dy;
 	long err2;
 
+	long yoffset = (y * (long)320);
+
 	while(1)
 	{
-		*((unsigned int*)pBuffer + x + (y * (long)320)) = col;
-		
+		*((unsigned int*)pBuffer + x + yoffset) = col;
+
 		if(x == x2 && y == y2) break;
-		
+
 		err2 = 2 * err;
-		
+
 		if(err2 >= dy)
 		{
 			err += dy;
 			x += sx;
 		}
-		
+
 		if(err2 <= dx)
 		{
 			err += dx;
 			y += sy;
+			yoffset += 320;
 		}
 	}
 }

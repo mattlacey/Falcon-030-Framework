@@ -8,6 +8,7 @@
 typedef struct
 {
 	V3 * verts;
+	V3 * vertsX;
 	long vertCount;
 	long * indices;
 	long indexCount;

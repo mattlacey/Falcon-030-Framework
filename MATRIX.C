@@ -33,7 +33,7 @@ void setProjection(Mat3d m)
 
 }
 
-void setRotX(Mat3d out, int angle)
+void setRotX(Mat3d out, long angle)
 {
 	fx32 sx = sinTable[angle];
 	fx32 cx = cosTable[angle];
@@ -43,7 +43,7 @@ void setRotX(Mat3d out, int angle)
 	out[0][3] = 0;      out[1][3] = 0;      out[2][3] = 0;      out[3][3] = FX_ONE;
 }
 
-void setRotY(Mat3d out, int angle)
+void setRotY(Mat3d out, long angle)
 {
 	fx32 sy = sinTable[angle];
 	fx32 cy = cosTable[angle];
@@ -53,7 +53,7 @@ void setRotY(Mat3d out, int angle)
 	out[0][3] = 0;      out[1][3] = 0;      out[2][3] = 0;      out[3][3] = FX_ONE;
 }
 
-void setRotZ(Mat3d out, int angle)
+void setRotZ(Mat3d out, long angle)
 {
 	fx32 sz = sinTable[angle];
 	fx32 cz = cosTable[angle];
@@ -70,20 +70,20 @@ void multiplyMat3d(Mat3d out, Mat3d m1, Mat3d m2)
 	out[2][0] = FX_MUL(m1[0][0], m2[2][0]) + FX_MUL(m1[1][0], m2[2][1]) + FX_MUL(m1[2][0], m2[2][2]) + FX_MUL(m1[3][0], m2[2][3]);
 	out[3][0] = FX_MUL(m1[0][0], m2[3][0]) + FX_MUL(m1[1][0], m2[3][1]) + FX_MUL(m1[2][0], m2[3][2]) + FX_MUL(m1[3][0], m2[3][3]);
 
-	out[0][0] = FX_MUL(m1[0][1], m2[0][0]) + FX_MUL(m1[1][1], m2[0][1]) + FX_MUL(m1[2][1], m2[0][2]) + FX_MUL(m1[3][1], m2[0][3]);
-	out[1][0] = FX_MUL(m1[0][1], m2[1][0]) + FX_MUL(m1[1][1], m2[1][1]) + FX_MUL(m1[2][1], m2[1][2]) + FX_MUL(m1[3][1], m2[1][3]);
-	out[2][0] = FX_MUL(m1[0][1], m2[2][0]) + FX_MUL(m1[1][1], m2[2][1]) + FX_MUL(m1[2][1], m2[2][2]) + FX_MUL(m1[3][1], m2[2][3]);
-	out[3][0] = FX_MUL(m1[0][1], m2[3][0]) + FX_MUL(m1[1][1], m2[3][1]) + FX_MUL(m1[2][1], m2[3][2]) + FX_MUL(m1[3][1], m2[3][3]);
+	out[0][1] = FX_MUL(m1[0][1], m2[0][0]) + FX_MUL(m1[1][1], m2[0][1]) + FX_MUL(m1[2][1], m2[0][2]) + FX_MUL(m1[3][1], m2[0][3]);
+	out[1][1] = FX_MUL(m1[0][1], m2[1][0]) + FX_MUL(m1[1][1], m2[1][1]) + FX_MUL(m1[2][1], m2[1][2]) + FX_MUL(m1[3][1], m2[1][3]);
+	out[2][1] = FX_MUL(m1[0][1], m2[2][0]) + FX_MUL(m1[1][1], m2[2][1]) + FX_MUL(m1[2][1], m2[2][2]) + FX_MUL(m1[3][1], m2[2][3]);
+	out[3][1] = FX_MUL(m1[0][1], m2[3][0]) + FX_MUL(m1[1][1], m2[3][1]) + FX_MUL(m1[2][1], m2[3][2]) + FX_MUL(m1[3][1], m2[3][3]);
 
-	out[0][0] = FX_MUL(m1[0][2], m2[0][0]) + FX_MUL(m1[1][2], m2[0][1]) + FX_MUL(m1[2][2], m2[0][2]) + FX_MUL(m1[3][2], m2[0][3]);
-	out[1][0] = FX_MUL(m1[0][2], m2[1][0]) + FX_MUL(m1[1][2], m2[1][1]) + FX_MUL(m1[2][2], m2[1][2]) + FX_MUL(m1[3][2], m2[1][3]);
-	out[2][0] = FX_MUL(m1[0][2], m2[2][0]) + FX_MUL(m1[1][2], m2[2][1]) + FX_MUL(m1[2][2], m2[2][2]) + FX_MUL(m1[3][2], m2[2][3]);
-	out[3][0] = FX_MUL(m1[0][2], m2[3][0]) + FX_MUL(m1[1][2], m2[3][1]) + FX_MUL(m1[2][2], m2[3][2]) + FX_MUL(m1[3][2], m2[3][3]);
+	out[0][2] = FX_MUL(m1[0][2], m2[0][0]) + FX_MUL(m1[1][2], m2[0][1]) + FX_MUL(m1[2][2], m2[0][2]) + FX_MUL(m1[3][2], m2[0][3]);
+	out[1][2] = FX_MUL(m1[0][2], m2[1][0]) + FX_MUL(m1[1][2], m2[1][1]) + FX_MUL(m1[2][2], m2[1][2]) + FX_MUL(m1[3][2], m2[1][3]);
+	out[2][2] = FX_MUL(m1[0][2], m2[2][0]) + FX_MUL(m1[1][2], m2[2][1]) + FX_MUL(m1[2][2], m2[2][2]) + FX_MUL(m1[3][2], m2[2][3]);
+	out[3][2] = FX_MUL(m1[0][2], m2[3][0]) + FX_MUL(m1[1][2], m2[3][1]) + FX_MUL(m1[2][2], m2[3][2]) + FX_MUL(m1[3][2], m2[3][3]);
 
-	out[0][0] = FX_MUL(m1[0][3], m2[0][0]) + FX_MUL(m1[1][3], m2[0][1]) + FX_MUL(m1[2][3], m2[0][2]) + FX_MUL(m1[3][3], m2[0][3]);
-	out[1][0] = FX_MUL(m1[0][3], m2[1][0]) + FX_MUL(m1[1][3], m2[1][1]) + FX_MUL(m1[2][3], m2[1][2]) + FX_MUL(m1[3][3], m2[1][3]);
-	out[2][0] = FX_MUL(m1[0][3], m2[2][0]) + FX_MUL(m1[1][3], m2[2][1]) + FX_MUL(m1[2][3], m2[2][2]) + FX_MUL(m1[3][3], m2[2][3]);
-	out[3][0] = FX_MUL(m1[0][3], m2[3][0]) + FX_MUL(m1[1][3], m2[3][1]) + FX_MUL(m1[2][3], m2[3][2]) + FX_MUL(m1[3][3], m2[3][3]);
+	out[0][3] = FX_MUL(m1[0][3], m2[0][0]) + FX_MUL(m1[1][3], m2[0][1]) + FX_MUL(m1[2][3], m2[0][2]) + FX_MUL(m1[3][3], m2[0][3]);
+	out[1][3] = FX_MUL(m1[0][3], m2[1][0]) + FX_MUL(m1[1][3], m2[1][1]) + FX_MUL(m1[2][3], m2[1][2]) + FX_MUL(m1[3][3], m2[1][3]);
+	out[2][3] = FX_MUL(m1[0][3], m2[2][0]) + FX_MUL(m1[1][3], m2[2][1]) + FX_MUL(m1[2][3], m2[2][2]) + FX_MUL(m1[3][3], m2[2][3]);
+	out[3][3] = FX_MUL(m1[0][3], m2[3][0]) + FX_MUL(m1[1][3], m2[3][1]) + FX_MUL(m1[2][3], m2[3][2]) + FX_MUL(m1[3][3], m2[3][3]);
 }
 
 /* Not compatible with translation or projection */

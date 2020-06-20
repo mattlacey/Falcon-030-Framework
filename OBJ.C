@@ -72,6 +72,7 @@ Obj loadObj(char * filename)
 	fseek(f, 0, SEEK_SET);
 
 	o.verts = malloc(sizeof(V3) * o.vertCount);
+	o.vertsX = malloc(sizeof(V3) * o.vertCount);
 	o.indices = malloc(sizeof(long) * o.indexCount);
 
 	while(fgets(line, sizeof line, f))
@@ -128,27 +129,34 @@ Obj loadObj(char * filename)
 void renderObject(Obj o, Mat3d cam, void* pBuffer)
 {
 	int i = 0;
+	unsigned int col = 0;
 	Tri tx;
-	V3 v1, v2, v3;
+	V3 v1, v2, v3, vCam, normal;
 
-	/* Should transform all verts first, but for now we're going dumb */
+	/* Extract this from the camera matrix z component */
+	vCam = Vec3(0, 0, FX_ONE);
+
+	for(i = 0; i < o.vertCount; i++)
+	{
+		v1 = V3xMat3d(o.verts[i], o.mat);
+		v1 = addVec3(v1, o.pos);
+		o.vertsX[i] = V3xMat3dHom(v1, cam);
+	}
 
 	for(i = 0; i < o.indexCount; i+= 3)
 	{
-		v1 = V3xMat3d(o.verts[o.indices[i + 0]], o.mat);
-		v2 = V3xMat3d(o.verts[o.indices[i + 1]], o.mat);
-		v3 = V3xMat3d(o.verts[o.indices[i + 2]], o.mat);
+		col += 4096;
 
-		v1 = addVec3(v1, o.pos);
-		v2 = addVec3(v2, o.pos);
-		v3 = addVec3(v3, o.pos);
+		v1 = o.vertsX[o.indices[i + 0]];
+		v2 = o.vertsX[o.indices[i + 1]];
+		v3 = o.vertsX[o.indices[i + 2]];
 
-		v1 = V3xMat3dHom(v1, cam);
-		v2 = V3xMat3dHom(v2, cam);
-		v3 = V3xMat3dHom(v3, cam);
-
-		tx = makeTri(v1, v2, v3, o.col);
-		triToScreen(&tx);
-		renderTri(tx, pBuffer);
+		normal = cross(subVec3(v2, v1), subVec3(v3, v1));
+		if(dot(normal, vCam) < 0)
+		{
+			tx = makeTri(v1, v2, v3, col);
+			triToScreen(&tx);
+			renderTri(tx, pBuffer);
+		}
 	}
 }

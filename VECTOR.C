@@ -43,13 +43,7 @@ V3 cross(V3 a, V3 b)
 	return out;
 }
 
-V3 dot(V3 a, V3 b)
+fx32 dot(V3 a, V3 b)
 {
-	V3 out;
-
-	out.x = FX_MUL(a.x, b.x);
-	out.y = FX_MUL(a.y, b.y);
-	out.z = FX_MUL(a.z, b.z);
-
-	return out;
+	return FX_MUL(a.x, b.x) + FX_MUL(a.y, b.y) + FX_MUL(a.z, b.z);
 }
