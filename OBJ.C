@@ -6,6 +6,7 @@
 #include "OBJ.H"
 #include "FRAMEWRK.H"
 #include "FX.H"
+#include "VECTOR.H"
 
 void loadTest()
 {
@@ -34,17 +35,20 @@ Obj loadObj(char * filename)
 	FILE* f;
 	int currentVert = 0;
 	int currentIndex = 0;
+	int currentNormal = 0;
 	int scanCount = 0;
 	Obj o;
 	char input[128];
 	char line[128];
 	char floats[4][32];
 	long indices[3];
+	V3 v1, v2, v3;
 
 	setIdentity(o.mat);
 	o.pos = Vec3(0, 0, 0);
 	o.vertCount = 0;
 	o.indexCount = 0;
+	o.faceCount = 0;
 
 	f = fopen(filename, "r");
 
@@ -102,10 +106,30 @@ Obj loadObj(char * filename)
 			o.indices[currentIndex + 1] = indices[1] - 1;
 			o.indices[currentIndex + 2] = indices[2] - 1;
 			currentIndex += 3;
+
+			o.faceCount++;
 		}
 	}
 
 	fclose(f);
+
+	o.faceNormals = malloc(sizeof(V3) * o.faceCount);
+	o.faceNormalsX = malloc(sizeof(V3) * o.faceCount);
+
+	for(currentNormal = 0, currentIndex = 0; currentNormal < o.faceCount; currentNormal++, currentIndex += 3)
+	{
+		v1 = o.verts[currentIndex];
+		v2 = o.verts[currentIndex + 1];
+		v3 = o.verts[currentIndex + 2];
+
+		v2 = subVec3(v2, v1);
+		normalize(&v2);
+
+		v3 = subVec3(v3, v1);
+		normalize(&v3);
+
+		o.faceNormals[currentNormal] = cross(v2, v3);
+	}
 
 #ifndef RUN_ENGINE
 	printf("Verts: %ld, Indices: %ld\n", o.vertCount, o.indexCount);
@@ -128,10 +152,10 @@ Obj loadObj(char * filename)
 
 void renderObject(Obj o, Mat3d cam, void* pBuffer)
 {
-	int i = 0;
+	int i = 0, j = 0;
 	unsigned int col = 0;
 	Tri tx;
-	V3 v1, v2, v3, vCam, normal;
+	V3 v1, v2, v3, vCam;
 
 	/* Extract this from the camera matrix z component */
 	vCam = Vec3(0, 0, FX_ONE);
@@ -143,7 +167,12 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 		o.vertsX[i] = V3xMat3dHom(v1, cam);
 	}
 
-	for(i = 0; i < o.indexCount; i+= 3)
+	for(i = 0; i < o.faceCount; i++)
+	{
+		o.faceNormalsX[i] = V3xMat3d(o.faceNormals[i], o.mat);
+	}
+
+	for(i = 0, j = 0; i < o.indexCount; i+= 3, j++)
 	{
 		col += 4096;
 
@@ -151,8 +180,7 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 		v2 = o.vertsX[o.indices[i + 1]];
 		v3 = o.vertsX[o.indices[i + 2]];
 
-		normal = cross(subVec3(v2, v1), subVec3(v3, v1));
-		if(dot(normal, vCam) < 0)
+		/*if(dot(o.faceNormalsX[j], vCam) < 0)*/
 		{
 			tx = makeTri(v1, v2, v3, col);
 			triToScreen(&tx);

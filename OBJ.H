@@ -9,9 +9,12 @@ typedef struct
 {
 	V3 * verts;
 	V3 * vertsX;
+	V3 * faceNormals;
+	V3 * faceNormalsX;
 	long vertCount;
 	long * indices;
 	long indexCount;
+	long faceCount;
 
 	V3 pos;
 	Mat3d mat;

@@ -4,6 +4,7 @@
 typedef long fx32;
 
 #define FX_SHIFT (16)
+#define FX_SIZE (32)
 #define FX_HSHIFT (8)
 #define FX_ONE ((fx32)1 << FX_SHIFT)
 #define FX_HALF ((fx32)1 << (FX_SHIFT - 1))
@@ -19,6 +20,7 @@ extern fx32 sinTable[360];
 extern fx32 cosTable[360];
 
 void initTables(void);
+fx32 fx32abs(fx32 value);
 
 #endif
 

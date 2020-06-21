@@ -16,5 +16,6 @@ V3 addVec3(V3 a, V3 b);
 V3 subVec3(V3 a, V3 b);
 V3 cross(V3 a, V3 b);
 fx32 dot(V3 a, V3 b);
+void normalize(V3 *a);
 
 #endif

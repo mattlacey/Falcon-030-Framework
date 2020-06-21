@@ -16,3 +16,11 @@ void initTables()
 		cosTable[i] = FX_ONE * cos(angle);
 	}
 }
+
+fx32 fx32abs(fx32 value)
+{
+	/* sign extend all the way */
+	long mask = value >> (FX_SIZE - 1);
+	value = value ^ mask;
+	value = value - mask;
+}

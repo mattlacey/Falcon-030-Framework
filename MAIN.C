@@ -71,7 +71,7 @@ int main()
 	setProjection(cam);
 
 #ifdef CUBE
-	o = loadObj("DATA/CUBE.OBJ");
+	o = loadObj("DATA/SQUARE.OBJ");
 	o.pos = Vec3(0, 0, FX_ONE * 5);
 #else
 	o = loadObj("DATA/TEAPOT.OBJ");
