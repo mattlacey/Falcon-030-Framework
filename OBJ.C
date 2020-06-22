@@ -118,20 +118,33 @@ Obj loadObj(char * filename)
 
 	for(currentNormal = 0, currentIndex = 0; currentNormal < o.faceCount; currentNormal++, currentIndex += 3)
 	{
-		v1 = o.verts[currentIndex];
-		v2 = o.verts[currentIndex + 1];
-		v3 = o.verts[currentIndex + 2];
+		v1 = o.verts[o.indices[currentIndex]];
+		v2 = o.verts[o.indices[currentIndex + 1]];
+		v3 = o.verts[o.indices[currentIndex + 2]];
 
 		v2 = subVec3(v2, v1);
+		printV3(v2);
+		printV3(v3);
 		normalize(&v2);
 
 		v3 = subVec3(v3, v1);
 		normalize(&v3);
 
 		o.faceNormals[currentNormal] = cross(v2, v3);
+
+#ifndef RUN_ENGINE
+		printf("Face sides:\n");
+		printV3(v2);
+		printV3(v3);
+
+		printf("CP: ");
+		printV3(o.faceNormals[currentNormal]);
+		printf("\n\n");
+#endif
 	}
 
 #ifndef RUN_ENGINE
+/*
 	printf("Verts: %ld, Indices: %ld\n", o.vertCount, o.indexCount);
 
 	for(currentVert = 0; currentVert < o.vertCount; currentVert++)
@@ -145,6 +158,7 @@ Obj loadObj(char * filename)
 	{
 		printf("%ld - %ld - %ld\n", o.indices[currentVert], o.indices[currentVert + 1], o.indices[currentVert + 2]);
 	}
+*/
 #endif
 
 	return o;
@@ -180,7 +194,7 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 		v2 = o.vertsX[o.indices[i + 1]];
 		v3 = o.vertsX[o.indices[i + 2]];
 
-		/*if(dot(o.faceNormalsX[j], vCam) < 0)*/
+		if(dot(o.faceNormalsX[j], vCam) < 0)
 		{
 			tx = makeTri(v1, v2, v3, col);
 			triToScreen(&tx);

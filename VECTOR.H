@@ -12,6 +12,7 @@ typedef struct Vector3
 
 V3 Vec3(long x, long y, long z);
 
+void printV3(V3 v);
 V3 addVec3(V3 a, V3 b);
 V3 subVec3(V3 a, V3 b);
 V3 cross(V3 a, V3 b);

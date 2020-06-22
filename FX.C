@@ -23,4 +23,5 @@ fx32 fx32abs(fx32 value)
 	long mask = value >> (FX_SIZE - 1);
 	value = value ^ mask;
 	value = value - mask;
+	return value;
 }

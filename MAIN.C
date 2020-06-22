@@ -27,11 +27,6 @@ int VgetMode(void)
 	return xbios(88, (int)-1);
 }
 
-void printV3(V3 v)
-{
-	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
-}
-
 void renderBG(void *pBuffer)
 {
 	unsigned int col = 0;
@@ -52,6 +47,9 @@ int main()
 	long i = 0;
 	long screenSize;
 
+	fx32 fxtemp;
+
+	V3 v;
 	Mat3d cam;
 	Mat3d rotZ;
 	Mat3d rotY;
@@ -148,6 +146,15 @@ int main()
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
 
 #endif
+
+	v = Vec3(FX_ONE, 0, 0);
+	printV3(v);
+	normalize(&v);
+	printV3(v);
+
+	printf("1 * 1 = %ld\n", FX_MUL(FX_ONE, FX_ONE));
+	printf("1 * 2 = %ld\n", FX_MUL(FX_ONE, 2 * FX_ONE));
+	printf("1 / 1 = %ld\n", FX_DIV(FX_ONE, FX_ONE));
 
 	printf("\n\nPress a key to continue...\n");
 	while(!kbhit());

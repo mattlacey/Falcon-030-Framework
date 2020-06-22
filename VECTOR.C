@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "vector.h"
 #include "fx.h"
 
@@ -13,6 +15,11 @@ V3 Vec3(long x, long y, long z)
 	v.y = y;
 	v.z = z;
 	return v;
+}
+
+void printV3(V3 v)
+{
+	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
 }
 
 V3 addVec3(V3 a, V3 b)
@@ -43,7 +50,7 @@ V3 cross(V3 a, V3 b)
 
 	out.x = FX_MUL(a.y, b.z) - FX_MUL(a.z, b.y);
 	out.y = FX_MUL(a.x, b.z) - FX_MUL(a.z, b.x);
-	out.z = FX_MUL(a.x, b.y) - FX_MUL(a.y, b.z);
+	out.z = FX_MUL(a.x, b.y) - FX_MUL(a.y, b.x);
 
 	return out;
 }
