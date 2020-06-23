@@ -121,12 +121,12 @@ Obj loadObj(char * filename)
 		v1 = o.verts[o.indices[currentIndex]];
 		v2 = o.verts[o.indices[currentIndex + 1]];
 		v3 = o.verts[o.indices[currentIndex + 2]];
-
+/*
 		v2 = subVec3(v2, v1);
 		printV3(v2);
 		printV3(v3);
+*/
 		normalize(&v2);
-
 		v3 = subVec3(v3, v1);
 		normalize(&v3);
 

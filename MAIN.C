@@ -70,10 +70,10 @@ int main()
 
 #ifdef CUBE
 	o = loadObj("DATA/SQUARE.OBJ");
-	o.pos = Vec3(0, 0, FX_ONE * 5);
+	o.pos = Vec3(0, 0, - FX_ONE * 2);
 #else
 	o = loadObj("DATA/TEAPOT.OBJ");
-	o.pos = Vec3(0, 0, FX_ONE * 200);
+	o.pos = Vec3(0, 0, FX_ONE * 100);
 #endif
 
 	maxIndices = o.indexCount;
@@ -138,6 +138,10 @@ int main()
 			else if(c == 'o' && o.indexCount < maxIndices - 3)
 				o.indexCount += 3;
 
+			if(c == 'w')
+				o.pos.z += FX_ONE;
+			else if(c == 's')
+				o.pos.z -= FX_ONE;
 		}
 
 		tick++;
@@ -151,10 +155,6 @@ int main()
 	printV3(v);
 	normalize(&v);
 	printV3(v);
-
-	printf("1 * 1 = %ld\n", FX_MUL(FX_ONE, FX_ONE));
-	printf("1 * 2 = %ld\n", FX_MUL(FX_ONE, 2 * FX_ONE));
-	printf("1 / 1 = %ld\n", FX_DIV(FX_ONE, FX_ONE));
 
 	printf("\n\nPress a key to continue...\n");
 	while(!kbhit());

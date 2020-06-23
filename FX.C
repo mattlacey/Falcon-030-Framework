@@ -25,3 +25,26 @@ fx32 fx32abs(fx32 value)
 	value = value - mask;
 	return value;
 }
+
+fx32 safeDiv(fx32 a, fx32 b)
+{
+	int i;
+
+	for(i = 0; i < FX_SHIFT; i++)
+	{
+		if(a < 0x7fffff && b)
+		{
+			return FX_DIV(a, b);
+		}
+
+		a = a >> 1;
+		b = b >> 1;
+
+		if(!b)
+		{
+			return 0;
+		}
+	}
+
+	return 0;
+}
