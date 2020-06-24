@@ -12,7 +12,7 @@ A basic C Framework / 3D engine for the Atari Falcon
 
 ## Matrices
 
-- [ ] Fix rotations
+- [x] Fix rotations
 - [ ] Vector to matrix
 
 ## Lights

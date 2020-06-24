@@ -49,7 +49,7 @@ int main()
 
 	fx32 fxtemp;
 
-	V3 v;
+	V3 v, v1;
 	Mat3d cam;
 	Mat3d rotZ;
 	Mat3d rotY;
@@ -70,7 +70,7 @@ int main()
 
 #ifdef CUBE
 	o = loadObj("DATA/SQUARE.OBJ");
-	o.pos = Vec3(0, 0, - FX_ONE * 2);
+	o.pos = Vec3(0, 0, FX_ONE * 5);
 #else
 	o = loadObj("DATA/TEAPOT.OBJ");
 	o.pos = Vec3(0, 0, FX_ONE * 100);
@@ -151,10 +151,7 @@ int main()
 
 #endif
 
-	v = Vec3(FX_ONE, 0, 0);
-	printV3(v);
-	normalize(&v);
-	printV3(v);
+	renderObjectDebug(o, cam);
 
 	printf("\n\nPress a key to continue...\n");
 	while(!kbhit());

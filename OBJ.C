@@ -164,6 +164,40 @@ Obj loadObj(char * filename)
 	return o;
 }
 
+void renderObjectDebug(Obj o, Mat3d cam)
+{
+	int i = 0, j = 0;
+	unsigned int col = 0;
+	Tri tx;
+	V3 v1, v2, v3, vCam;
+
+	/* Extract this from the camera matrix z component */
+	vCam = Vec3(0, 0, FX_ONE);
+
+	for(i = 0; i < o.vertCount; i++)
+	{
+		v1 = V3xMat3d(o.verts[i], o.mat);
+		v1 = addVec3(v1, o.pos);
+		o.vertsX[i] = V3xMat3dHom(v1, cam);
+	}
+
+	for(i = 0, j = 0; i < o.indexCount; i+= 3, j++)
+	{
+		col += 4096;
+
+		v1 = o.vertsX[o.indices[i + 0]];
+		v2 = o.vertsX[o.indices[i + 1]];
+		v3 = o.vertsX[o.indices[i + 2]];
+
+		/* if(dot(o.faceNormalsX[j], vCam) < 0)*/
+		{
+			tx = makeTri(v1, v2, v3, col);
+			triToScreen(&tx);
+			printTri(&tx);
+		}
+	}
+}
+
 void renderObject(Obj o, Mat3d cam, void* pBuffer)
 {
 	int i = 0, j = 0;
