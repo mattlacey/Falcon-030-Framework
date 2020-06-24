@@ -121,11 +121,13 @@ Obj loadObj(char * filename)
 		v1 = o.verts[o.indices[currentIndex]];
 		v2 = o.verts[o.indices[currentIndex + 1]];
 		v3 = o.verts[o.indices[currentIndex + 2]];
+
 /*
-		v2 = subVec3(v2, v1);
 		printV3(v2);
 		printV3(v3);
 */
+
+		v2 = subVec3(v2, v1);
 		normalize(&v2);
 		v3 = subVec3(v3, v1);
 		normalize(&v3);
@@ -228,7 +230,7 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 		v2 = o.vertsX[o.indices[i + 1]];
 		v3 = o.vertsX[o.indices[i + 2]];
 
-		if(dot(o.faceNormalsX[j], vCam) < 0)
+		 if(dot(o.faceNormalsX[j], vCam) < 0)
 		{
 			tx = makeTri(v1, v2, v3, col);
 			triToScreen(&tx);

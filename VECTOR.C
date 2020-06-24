@@ -94,10 +94,6 @@ void normalize(V3 *v)
 	len = FX_MUL(ALPHA_MAX, c) + FX_MUL(BETA_MED, b) + FX_MUL(GAMMA_MIN, a);
 	len = (c > len ? c : len);
 
-	tv = Vec3(a, b, c);
-	printV3(tv);
-	printf("Length: %ld\n", len);
-
 	if(len)
 	{
 		v->x = FX_DIV(v->x, len);

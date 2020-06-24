@@ -51,8 +51,10 @@ int main()
 
 	V3 v, v1;
 	Mat3d cam;
-	Mat3d rotZ;
+	Mat3d rotX;
 	Mat3d rotY;
+	Mat3d rotZ;
+	Mat3d mTemp;
 
 	Obj o;
 
@@ -124,7 +126,9 @@ int main()
 
 		setRotZ(rotZ, i);
 		setRotY(rotY, i);
-		multiplyMat3d(o.mat, rotZ, rotY);
+		setRotX(rotX, i);
+		multiplyMat3d(mTemp, rotZ, rotY);
+		multiplyMat3d(o.mat, rotX, mTemp);
 
 		if(kbhit())
 		{
