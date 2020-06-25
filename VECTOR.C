@@ -96,8 +96,9 @@ void normalize(V3 *v)
 
 	if(len)
 	{
-		v->x = FX_DIV(v->x, len);
-		v->y = FX_DIV(v->y, len);
-		v->z = FX_DIV(v->z, len);
+		temp = FX_DIV(FX_ONE, len);
+		v->x = FX_MUL(v->x, temp);
+		v->y = FX_MUL(v->y, temp);
+		v->z = FX_MUL(v->z, temp);
 	}
 }
