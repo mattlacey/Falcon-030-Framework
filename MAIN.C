@@ -27,21 +27,34 @@ int VgetMode(void)
 	return xbios(88, (int)-1);
 }
 
-void printV3(V3 v)
+void renderBG(void *pBuffer)
 {
-	printf("(%ld, %ld, %ld)\n", v.x, v.y, v.z);
+	unsigned int col = 0;
+	long i;
+	long res = 320 * 240;
+
+	for(i = 0; i < res; i++)
+	{
+		*((unsigned int *)pBuffer + i) = col;
+	}
 }
 
 int main()
 {
 	int prevMode;
-	int maxIndices;
-	unsigned col = 0;
+	long maxIndices;
 	unsigned long tick = 0;
 	long i = 0;
 	long screenSize;
 
+	fx32 fxtemp;
+
+	V3 v, v1;
 	Mat3d cam;
+	Mat3d rotX;
+	Mat3d rotY;
+	Mat3d rotZ;
+	Mat3d mTemp;
 
 	Obj o;
 
@@ -56,8 +69,15 @@ int main()
 	prevPhyBase = Physbase();
 
 	setProjection(cam);
+
+#ifdef CUBE
+	o = loadObj("DATA/ICO.OBJ");
+	o.pos = Vec3(0, 0, FX_ONE * 5);
+#else
 	o = loadObj("DATA/TEAPOT.OBJ");
 	o.pos = Vec3(0, 0, FX_ONE * 200);
+#endif
+
 	maxIndices = o.indexCount;
 	/*o.indexCount = 0;*/
 
@@ -93,17 +113,22 @@ int main()
 		xbios(5, buffers[0], buffers[1], -1);
 		Vsync();
 
+	/*	renderBG(current); */
+		memset(current, 0x00, screenSize);
 		renderObject(o, cam, current);
 
-		i ++;
+		i += 2;
 
 		if(i == 360)
 		{
 			i = 0;
 		}
 
-		/*setRotY(obj.mat, i);*/
-		/*o.pos.z = -FX_ONE * 150 - (i << FX_SHIFT);*/
+		setRotZ(rotZ, i);
+		setRotY(rotY, i);
+		setRotX(rotX, i);
+		multiplyMat3d(mTemp, rotZ, rotY);
+		multiplyMat3d(o.mat, rotX, mTemp);
 
 		if(kbhit())
 		{
@@ -117,6 +142,10 @@ int main()
 			else if(c == 'o' && o.indexCount < maxIndices - 3)
 				o.indexCount += 3;
 
+			if(c == 'w')
+				o.pos.z += FX_ONE;
+			else if(c == 's')
+				o.pos.z -= FX_ONE;
 		}
 
 		tick++;
@@ -126,8 +155,10 @@ int main()
 
 #endif
 
-	printf("\n\nPress a key to continue...\n");
+/* 	renderObjectDebug(o, cam);
+	printf("\nPress a key to continue...\n");
 	while(!kbhit());
+*/
 
 	free(buffers[0]);
 	free(buffers[1]);

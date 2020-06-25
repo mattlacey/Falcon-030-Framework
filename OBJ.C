@@ -6,6 +6,7 @@
 #include "OBJ.H"
 #include "FRAMEWRK.H"
 #include "FX.H"
+#include "VECTOR.H"
 
 void loadTest()
 {
@@ -34,22 +35,26 @@ Obj loadObj(char * filename)
 	FILE* f;
 	int currentVert = 0;
 	int currentIndex = 0;
+	int currentNormal = 0;
 	int scanCount = 0;
 	Obj o;
 	char input[128];
 	char line[128];
 	char floats[4][32];
 	long indices[3];
+	V3 v1, v2, v3;
 
 	setIdentity(o.mat);
 	o.pos = Vec3(0, 0, 0);
 	o.vertCount = 0;
 	o.indexCount = 0;
+	o.faceCount = 0;
 
 	f = fopen(filename, "r");
 
 	if(f == NULL)
 	{
+		printf("Failed to open file");
 		return o;
 	}
 
@@ -72,6 +77,7 @@ Obj loadObj(char * filename)
 	fseek(f, 0, SEEK_SET);
 
 	o.verts = malloc(sizeof(V3) * o.vertCount);
+	o.vertsX = malloc(sizeof(V3) * o.vertCount);
 	o.indices = malloc(sizeof(long) * o.indexCount);
 
 	while(fgets(line, sizeof line, f))
@@ -101,12 +107,46 @@ Obj loadObj(char * filename)
 			o.indices[currentIndex + 1] = indices[1] - 1;
 			o.indices[currentIndex + 2] = indices[2] - 1;
 			currentIndex += 3;
+			o.faceCount++;
 		}
 	}
 
 	fclose(f);
 
+#ifdef FACE_NORMALS
+	o.faceNormals = malloc(sizeof(V3) * o.faceCount);
+	o.faceNormalsX = malloc(sizeof(V3) * o.faceCount);
+
+	for(currentNormal = 0, currentIndex = 0; currentNormal < o.faceCount; currentNormal++, currentIndex += 3)
+	{
+		v1 = o.verts[o.indices[currentIndex]];
+		v2 = o.verts[o.indices[currentIndex + 1]];
+		v3 = o.verts[o.indices[currentIndex + 2]];
+
+		v1 = subVec3(v1, v2);
+		normalize(&v1);
+
+		v3 = subVec3(v3, v2);
+		normalize(&v3);
+
+		v2 = cross(v3, v1);
+		normalize(&v2);
+		o.faceNormals[currentNormal] = v2;
+
 #ifndef RUN_ENGINE
+		printf("Face sides: ");
+		printV3(v1);
+		printV3(v3);
+
+		printf("\nCP: ");
+		printV3(o.faceNormals[currentNormal]);
+		printf("\n");
+#endif
+	}
+#endif
+
+#ifndef RUN_ENGINE
+/*
 	printf("Verts: %ld, Indices: %ld\n", o.vertCount, o.indexCount);
 
 	for(currentVert = 0; currentVert < o.vertCount; currentVert++)
@@ -120,35 +160,94 @@ Obj loadObj(char * filename)
 	{
 		printf("%ld - %ld - %ld\n", o.indices[currentVert], o.indices[currentVert + 1], o.indices[currentVert + 2]);
 	}
+*/
 #endif
 
 	return o;
 }
 
+void renderObjectDebug(Obj o, Mat3d cam)
+{
+	int i = 0, j = 0;
+	unsigned int col = 0;
+	Tri tx;
+	V3 v1, v2, v3, vCam;
+
+	/* Extract this from the camera matrix z component */
+	vCam = Vec3(0, 0, FX_ONE);
+
+	for(i = 0; i < o.vertCount; i++)
+	{
+		v1 = V3xMat3d(o.verts[i], o.mat);
+		v1 = addVec3(v1, o.pos);
+		o.vertsX[i] = V3xMat3dHom(v1, cam);
+	}
+
+	for(i = 0, j = 0; i < o.indexCount; i+= 3, j++)
+	{
+		col += 4096;
+
+		v1 = o.vertsX[o.indices[i + 0]];
+		v2 = o.vertsX[o.indices[i + 1]];
+		v3 = o.vertsX[o.indices[i + 2]];
+
+		/* if(dot(o.faceNormalsX[j], vCam) < 0)*/
+		{
+			tx = makeTri(v1, v2, v3, col);
+			triToScreen(&tx);
+			printTri(&tx);
+		}
+	}
+}
+
 void renderObject(Obj o, Mat3d cam, void* pBuffer)
 {
-	int i = 0;
+	int i = 0, j = 0;
+	unsigned int col = 0;
 	Tri tx;
-	V3 v1, v2, v3;
+	V3 v1, v2, v3, vCam, ve1, ve2, vn;
 
-	/* Should transform all verts first, but for now we're going dumb */
+	/* Extract this from the camera matrix z component */
+	vCam = Vec3(0, 0, FX_ONE);
 
-	for(i = 0; i < o.indexCount; i+= 3)
+	for(i = 0; i < o.vertCount; i++)
 	{
-		v1 = V3xMat3d(o.verts[o.indices[i + 0]], o.mat);
-		v2 = V3xMat3d(o.verts[o.indices[i + 1]], o.mat);
-		v3 = V3xMat3d(o.verts[o.indices[i + 2]], o.mat);
-
+		v1 = V3xMat3d(o.verts[i], o.mat);
 		v1 = addVec3(v1, o.pos);
-		v2 = addVec3(v2, o.pos);
-		v3 = addVec3(v3, o.pos);
+		o.vertsX[i] = V3xMat3dHom(v1, cam);
+	}
 
-		v1 = V3xMat3dHom(v1, cam);
-		v2 = V3xMat3dHom(v2, cam);
-		v3 = V3xMat3dHom(v3, cam);
+#ifdef FACE_NORMALS
+	/*
+		see if it's faster to just do normals first, and eliminate entire faces. can we then skip verts?
+		only by lookign up which ones are completely unused... not sure it'd be much faster
+	*/
+		for(i = 0; i < o.faceCount; i++)
+		{
+			v1 = V3xMat3d(o.faceNormals[i], o.mat);
+			o.faceNormalsX[i] = V3xMat3dHom(v1, cam);
+		}
+#endif
 
-		tx = makeTri(v1, v2, v3, o.col);
-		triToScreen(&tx);
-		renderTri(tx, pBuffer);
+	for(i = 0, j = 0; i < o.indexCount; i+= 3, j++)
+	{
+		col += 4096;
+
+		v1 = o.vertsX[o.indices[i + 0]];
+		v2 = o.vertsX[o.indices[i + 1]];
+		v3 = o.vertsX[o.indices[i + 2]];
+
+		ve1 = subVec3(v1, v2);
+		ve2 = subVec3(v3, v2);
+
+		vn = cross(ve2, ve1);
+		normalize(&vn);
+	
+		if(dot(vn, vCam) <= 0)
+		{
+			tx = makeTri(v1, v2, v3, col);
+			triToScreen(&tx);
+			renderTri(tx, pBuffer);
+		}
 	}
 }
