@@ -54,6 +54,7 @@ Obj loadObj(char * filename)
 
 	if(f == NULL)
 	{
+		printf("Failed to open file");
 		return o;
 	}
 
@@ -106,13 +107,13 @@ Obj loadObj(char * filename)
 			o.indices[currentIndex + 1] = indices[1] - 1;
 			o.indices[currentIndex + 2] = indices[2] - 1;
 			currentIndex += 3;
-
 			o.faceCount++;
 		}
 	}
 
 	fclose(f);
 
+#ifdef FACE_NORMALS
 	o.faceNormals = malloc(sizeof(V3) * o.faceCount);
 	o.faceNormalsX = malloc(sizeof(V3) * o.faceCount);
 
@@ -122,28 +123,27 @@ Obj loadObj(char * filename)
 		v2 = o.verts[o.indices[currentIndex + 1]];
 		v3 = o.verts[o.indices[currentIndex + 2]];
 
-/*
-		printV3(v2);
-		printV3(v3);
-*/
+		v1 = subVec3(v1, v2);
+		normalize(&v1);
 
-		v2 = subVec3(v2, v1);
-		normalize(&v2);
-		v3 = subVec3(v3, v1);
+		v3 = subVec3(v3, v2);
 		normalize(&v3);
 
-		o.faceNormals[currentNormal] = cross(v2, v3);
+		v2 = cross(v3, v1);
+		normalize(&v2);
+		o.faceNormals[currentNormal] = v2;
 
 #ifndef RUN_ENGINE
-		printf("Face sides:\n");
-		printV3(v2);
+		printf("Face sides: ");
+		printV3(v1);
 		printV3(v3);
 
-		printf("CP: ");
+		printf("\nCP: ");
 		printV3(o.faceNormals[currentNormal]);
-		printf("\n\n");
+		printf("\n");
 #endif
 	}
+#endif
 
 #ifndef RUN_ENGINE
 /*
@@ -205,7 +205,7 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 	int i = 0, j = 0;
 	unsigned int col = 0;
 	Tri tx;
-	V3 v1, v2, v3, vCam;
+	V3 v1, v2, v3, vCam, ve1, ve2, vn;
 
 	/* Extract this from the camera matrix z component */
 	vCam = Vec3(0, 0, FX_ONE);
@@ -217,10 +217,17 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 		o.vertsX[i] = V3xMat3dHom(v1, cam);
 	}
 
-	for(i = 0; i < o.faceCount; i++)
-	{
-		o.faceNormalsX[i] = V3xMat3d(o.faceNormals[i], o.mat);
-	}
+#ifdef FACE_NORMALS
+	/*
+		see if it's faster to just do normals first, and eliminate entire faces. can we then skip verts?
+		only by lookign up which ones are completely unused... not sure it'd be much faster
+	*/
+		for(i = 0; i < o.faceCount; i++)
+		{
+			v1 = V3xMat3d(o.faceNormals[i], o.mat);
+			o.faceNormalsX[i] = V3xMat3dHom(v1, cam);
+		}
+#endif
 
 	for(i = 0, j = 0; i < o.indexCount; i+= 3, j++)
 	{
@@ -230,7 +237,13 @@ void renderObject(Obj o, Mat3d cam, void* pBuffer)
 		v2 = o.vertsX[o.indices[i + 1]];
 		v3 = o.vertsX[o.indices[i + 2]];
 
-		 if(dot(o.faceNormalsX[j], vCam) < 0)
+		ve1 = subVec3(v1, v2);
+		ve2 = subVec3(v3, v2);
+
+		vn = cross(ve2, ve1);
+		normalize(&vn);
+	
+		if(dot(vn, vCam) <= 0)
 		{
 			tx = makeTri(v1, v2, v3, col);
 			triToScreen(&tx);

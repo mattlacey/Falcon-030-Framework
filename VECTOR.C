@@ -49,7 +49,7 @@ V3 cross(V3 a, V3 b)
 	V3 out;
 
 	out.x = FX_MUL(a.y, b.z) - FX_MUL(a.z, b.y);
-	out.y = FX_MUL(a.x, b.z) - FX_MUL(a.z, b.x);
+	out.y = FX_MUL(a.z, b.x) - FX_MUL(a.x, b.z);
 	out.z = FX_MUL(a.x, b.y) - FX_MUL(a.y, b.x);
 
 	return out;

@@ -28,7 +28,7 @@ A basic C Framework / 3D engine for the Atari Falcon
 
 ## OBJ Loader
 
-- [ ] Vertex normals
+- [ ] Vertex normals?
 - [ ] Texture coordinates?
 
 ## Renderer
@@ -37,9 +37,9 @@ A basic C Framework / 3D engine for the Atari Falcon
 - [ ] Screen clipping for rasters
 - [ ] Flat shading
 - [ ] Per face colours
-- [ ] Backface culling
+- [x] Backface culling
 - [ ] Z-buffering
-- [ ] Object vector xform optimisation
+- [x] Object vector xform optimisation
 - [ ] Background
 - [ ] Text support
 

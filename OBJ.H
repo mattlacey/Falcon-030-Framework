@@ -5,12 +5,16 @@
 #include "VECTOR.H"
 #include "MATRIX.h"
 
+/* #define FACE_NORMALS (1) */
+
 typedef struct
 {
 	V3 * verts;
 	V3 * vertsX;
+#ifdef FACE_NORMALS
 	V3 * faceNormals;
 	V3 * faceNormalsX;
+#endif
 	long vertCount;
 	long * indices;
 	long indexCount;

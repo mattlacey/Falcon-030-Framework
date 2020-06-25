@@ -71,11 +71,11 @@ int main()
 	setProjection(cam);
 
 #ifdef CUBE
-	o = loadObj("DATA/SQUARE.OBJ");
+	o = loadObj("DATA/ICO.OBJ");
 	o.pos = Vec3(0, 0, FX_ONE * 5);
 #else
 	o = loadObj("DATA/TEAPOT.OBJ");
-	o.pos = Vec3(0, 0, FX_ONE * 100);
+	o.pos = Vec3(0, 0, FX_ONE * 200);
 #endif
 
 	maxIndices = o.indexCount;
@@ -155,10 +155,10 @@ int main()
 
 #endif
 
-	renderObjectDebug(o, cam);
-
-	printf("\n\nPress a key to continue...\n");
+/* 	renderObjectDebug(o, cam);
+	printf("\nPress a key to continue...\n");
 	while(!kbhit());
+*/
 
 	free(buffers[0]);
 	free(buffers[1]);
