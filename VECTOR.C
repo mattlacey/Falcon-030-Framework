@@ -64,6 +64,7 @@ void normalize(V3 *v)
 {
 	/* https://math.stackexchange.com/a/3182291/65473 */
 	fx32 a, b, c, temp, len;
+	V3 tv;
 
 	a = fx32abs(v->x);
 	b = fx32abs(v->y);

@@ -3,6 +3,15 @@
 
 #include <stdio.h>
 
+
+void printTri(Tri *pTri)
+{
+	printf("(%ld, %ld, %ld)  (%ld, %ld, %ld)  (%ld, %ld, %ld)\n",
+		pTri->verts[0].x, pTri->verts[0].y, pTri->verts[0].z,
+		pTri->verts[1].x, pTri->verts[1].y, pTri->verts[1].z,
+		pTri->verts[2].x, pTri->verts[2].y, pTri->verts[2].z);
+}
+
 Tri makeTri(V3 vec1, V3 vec2, V3 vec3, unsigned col)
 {
 	Tri t;
@@ -15,13 +24,13 @@ Tri makeTri(V3 vec1, V3 vec2, V3 vec3, unsigned col)
 
 void triToScreen(Tri *pTri)
 {
-	pTri->verts[0].x += 160;
-	pTri->verts[1].x += 160;
-	pTri->verts[2].x += 160;
+	pTri->verts[0].x = (pTri->verts[0].x >> FX_HSHIFT) + 160;
+	pTri->verts[1].x = (pTri->verts[1].x >> FX_HSHIFT) + 160;
+	pTri->verts[2].x = (pTri->verts[2].x >> FX_HSHIFT) + 160;
 
-	pTri->verts[0].y += 120;
-	pTri->verts[1].y += 120;
-	pTri->verts[2].y += 120;
+	pTri->verts[0].y = (pTri->verts[0].y >> FX_HSHIFT) + 120;
+	pTri->verts[1].y = (pTri->verts[1].y >> FX_HSHIFT) + 120;
+	pTri->verts[2].y = (pTri->verts[2].y >> FX_HSHIFT) + 120;
 }
 
 void renderTri(Tri t, void *pBuffer)

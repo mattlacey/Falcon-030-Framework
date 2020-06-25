@@ -5,9 +5,9 @@
 
 typedef struct Vector3
 {
-	long x;
-	long y;
-	long z;
+	fx32 x;
+	fx32 y;
+	fx32 z;
 } V3;
 
 V3 Vec3(long x, long y, long z);

@@ -23,6 +23,7 @@ typedef struct
 
 void loadTest(void);
 Obj loadObj(char * filename);
+void renderObjectDebug(Obj o, Mat3d cam);
 void renderObject(Obj o, Mat3d cam, void* pBuffer);
 
 #endif
