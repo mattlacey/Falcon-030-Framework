@@ -36,12 +36,15 @@ Obj loadObj(char * filename)
 	FILE* f;
 	int currentVert = 0;
 	int currentIndex = 0;
+	int currentNormal = 0;
 	int scanCount = 0;
 	Obj o;
 	char input[INPUT_BUFFER_SIZE];
 	char line[INPUT_BUFFER_SIZE];
 	char floats[4][32];
 	long indices[3];
+
+	V3 v1, v2, v3;
 
 	setIdentity(o.mat);
 	o.pos = Vec3(0, 0, 0);
@@ -111,6 +114,38 @@ Obj loadObj(char * filename)
 	}
 
 	fclose(f);
+
+#ifdef FACE_NORMALS
+	o.faceNormals = malloc(sizeof(V3) * o.faceCount);
+	o.faceNormalsX = malloc(sizeof(V3) * o.faceCount);
+
+	for(currentNormal = 0, currentIndex = 0; currentNormal < o.faceCount; currentNormal++, currentIndex += 3)
+	{
+		v1 = o.verts[o.indices[currentIndex]];
+		v2 = o.verts[o.indices[currentIndex + 1]];
+		v3 = o.verts[o.indices[currentIndex + 2]];
+
+		v1 = subVec3(v1, v2);
+		normalize(&v1);
+
+		v3 = subVec3(v3, v2);
+		normalize(&v3);
+
+		v2 = cross(v3, v1);
+		normalize(&v2);
+		o.faceNormals[currentNormal] = v2;
+
+#ifdef DEBUG_LOADER
+		printf("Face sides: ");
+		printV3(v1);
+		printV3(v3);
+
+		printf("\nCP: ");
+		printV3(o.faceNormals[currentNormal]);
+		printf("\n");
+#endif
+	}
+#endif
 
 #ifdef DEBUG_LOADER
 	printf("Verts:\n\n");
@@ -217,6 +252,14 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 		pObj->vertsX[i] = V3xMat3dHom(v1, cam);
 	}
 
+#ifdef FACE_NORMALS
+	for(i = 0; i < pObj->faceCount; i++)
+	{
+		v1 = V3xMat3d(pObj->faceNormals[i], pObj->mat);
+		pObj->faceNormalsX[i] = V3xMat3dHom(v1, cam);
+	}
+#endif
+
 	for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
 	{
 		v1 = pObj->vertsX[pObj->indices[i + 0]];
@@ -234,10 +277,25 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 		if(dot(vn, vCam) <= 0)
 		{
 			/* light needs to be in camera space too */
+#ifdef FACE_NORMALS
+/* 			fx32 light = dot(pObj->faceNormalsX[j], vLight); */
 			fx32 light = dot(vn, vLight);
 
 			/* 5 because we have 5 bits per channel */
-			col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
+
+			if(light > 0)
+			{
+				col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
+			}
+			else
+			{
+				col = 0;
+			}
+#else
+			col += 0xff;
+#endif
+
+			col |= 0x01;
 
 			tx = makeTri(v1, v2, v3, col);
 			triToScreen(&tx);
