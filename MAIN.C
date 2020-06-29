@@ -10,7 +10,7 @@
 #include "matrix.h"
 #include "obj.h"
 
-#define CUBE	0
+#define CUBE	1
 
 
 #define VM_BPS16	0x4
@@ -73,7 +73,7 @@ int main()
 
 	if(CUBE)
 	{
-		o = loadObj("DATA/BCUBE.OBJ");
+		o = loadObj("DATA/ICO.OBJ");
 		o.pos = Vec3(0, 0, FX_ONE * 8);
 	}
 	else

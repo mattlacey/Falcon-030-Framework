@@ -204,10 +204,11 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 	int i = 0, j = 0;
 	unsigned int col = 0;
 	Tri tx;
-	V3 v1, v2, v3, vCam, ve1, ve2, vn;
+	V3 v1, v2, v3, vCam, vLight, ve1, ve2, vn;
 
 	/* Extract this from the camera matrix z component */
 	vCam = Vec3(0, 0, FX_ONE);
+	vLight = Vec3(FX_ONE, -FX_ONE, 0);
 
 	for(i = 0; i < pObj->vertCount; i++)
 	{
@@ -218,8 +219,6 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 
 	for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
 	{
-		col += 4096;
-
 		v1 = pObj->vertsX[pObj->indices[i + 0]];
 		v2 = pObj->vertsX[pObj->indices[i + 1]];
 		v3 = pObj->vertsX[pObj->indices[i + 2]];
@@ -234,6 +233,12 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 	
 		if(dot(vn, vCam) <= 0)
 		{
+			/* light needs to be in camera space too */
+			fx32 light = dot(vn, vLight);
+
+			/* 5 because we have 5 bits per channel */
+			col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
+
 			tx = makeTri(v1, v2, v3, col);
 			triToScreen(&tx);
 			renderTri(tx, pBuffer);

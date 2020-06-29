@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-
 void printTri(Tri *pTri)
 {
 	printf("(%ld, %ld, %ld)  (%ld, %ld, %ld)  (%ld, %ld, %ld)\n",
@@ -89,9 +88,9 @@ void renderTri(Tri t, void *pBuffer)
 #endif
 
 #ifdef WIREFRAME
-	renderLine(top->x, top->y, bot->x, bot->y, 0xffe0, pBuffer);
-	renderLine(top->x, top->y, mid->x, mid->y, 0x0cff, pBuffer);
-	renderLine(mid->x, mid->y, bot->x, bot->y, 0xf81f, pBuffer);
+	renderLine(top->x, top->y, bot->x, bot->y, t.col, pBuffer);
+	renderLine(top->x, top->y, mid->x, mid->y, t.col, pBuffer);
+	renderLine(mid->x, mid->y, bot->x, bot->y, t.col, pBuffer);
 #endif
 
 }
