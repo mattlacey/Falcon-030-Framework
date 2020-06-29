@@ -64,7 +64,6 @@ void normalize(V3 *v)
 {
 	/* https://math.stackexchange.com/a/3182291/65473 */
 	fx32 a, b, c, temp, len;
-	V3 tv;
 
 	a = fx32abs(v->x);
 	b = fx32abs(v->y);
@@ -94,11 +93,18 @@ void normalize(V3 *v)
 	len = FX_MUL(ALPHA_MAX, c) + FX_MUL(BETA_MED, b) + FX_MUL(GAMMA_MIN, a);
 	len = (c > len ? c : len);
 
-	if(len)
+	if(len < (1 << 6))
 	{
+		len = (1 << 6);
+	}
+
+		/*
 		temp = FX_DIV(FX_ONE, len);
 		v->x = FX_MUL(v->x, temp);
 		v->y = FX_MUL(v->y, temp);
 		v->z = FX_MUL(v->z, temp);
-	}
+		*/
+		v->x = FX_DIV(v->x, len);
+		v->y = FX_DIV(v->y, len);
+		v->z = FX_DIV(v->z, len);
 }

@@ -10,7 +10,8 @@
 #include "matrix.h"
 #include "obj.h"
 
-#define DEBUG	0
+#define CUBE	0
+
 
 #define VM_BPS16	0x4
 #define VM_COL_80	0x8
@@ -70,13 +71,16 @@ int main()
 
 	setProjection(cam);
 
-#ifdef CUBE
-	o = loadObj("DATA/ICO.OBJ");
-	o.pos = Vec3(0, 0, FX_ONE * 5);
-#else
-	o = loadObj("DATA/TEAPOT.OBJ");
-	o.pos = Vec3(0, 0, FX_ONE * 200);
-#endif
+	if(CUBE)
+	{
+		o = loadObj("DATA/BCUBE.OBJ");
+		o.pos = Vec3(0, 0, FX_ONE * 8);
+	}
+	else
+	{
+		o = loadObj("DATA/MONKEY.OBJ");
+		o.pos = Vec3(0, 0, FX_ONE * 5);
+	}
 
 	maxIndices = o.indexCount;
 	/*o.indexCount = 0;*/
@@ -115,7 +119,7 @@ int main()
 
 	/*	renderBG(current); */
 		memset(current, 0x00, screenSize);
-		renderObject(o, cam, current);
+		renderObject(&o, cam, current);
 
 		i += 2;
 
@@ -155,10 +159,9 @@ int main()
 
 #endif
 
-/* 	renderObjectDebug(o, cam);
+/* 	renderObjectDebug(&o, cam);
 	printf("\nPress a key to continue...\n");
-	while(!kbhit());
-*/
+	while(!kbhit()); */
 
 	free(buffers[0]);
 	free(buffers[1]);
