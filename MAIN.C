@@ -73,7 +73,7 @@ int main()
 
 	if(CUBE)
 	{
-		o = loadObj("DATA/ICO.OBJ");
+		o = loadObj("DATA/BCUBE.OBJ");
 		o.pos = Vec3(0, 0, FX_ONE * 8);
 	}
 	else

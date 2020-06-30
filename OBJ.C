@@ -243,7 +243,8 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 
 	/* Extract this from the camera matrix z component */
 	vCam = Vec3(0, 0, FX_ONE);
-	vLight = Vec3(FX_ONE, -FX_ONE, 0);
+	vLight = Vec3(FX_ONE, FX_ONE, - FX_ONE);
+	normalize(&vLight);
 
 	for(i = 0; i < pObj->vertCount; i++)
 	{
@@ -255,8 +256,7 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 #ifdef FACE_NORMALS
 	for(i = 0; i < pObj->faceCount; i++)
 	{
-		v1 = V3xMat3d(pObj->faceNormals[i], pObj->mat);
-		pObj->faceNormalsX[i] = V3xMat3dHom(v1, cam);
+		pObj->faceNormalsX[i] = V3xMat3d(pObj->faceNormals[i], pObj->mat);
 	}
 #endif
 
@@ -289,7 +289,7 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 			}
 			else
 			{
-				col = 0;
+				col = GRN;
 			}
 #else
 			col += 0xff;
