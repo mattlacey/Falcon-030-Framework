@@ -45,7 +45,7 @@ int main()
 	int prevMode;
 	long maxIndices;
 	unsigned long tick = 0;
-	long i = 0;
+	long i = 0, step = 2;
 	long screenSize;
 
 	fx32 fxtemp;
@@ -73,7 +73,7 @@ int main()
 
 	if(CUBE)
 	{
-		o = loadObj("DATA/BCUBE.OBJ");
+		o = loadObj("DATA/SQUARE.OBJ");
 		o.pos = Vec3(0, 0, FX_ONE * 8);
 	}
 	else
@@ -121,18 +121,22 @@ int main()
 		memset(current, 0x00, screenSize);
 		renderObject(&o, cam, current);
 
-		i += 2;
+		i += step;
 
 		if(i == 360)
 		{
 			i = 0;
 		}
 
-		setRotZ(rotZ, i);
+/* 		setRotZ(rotZ, i);
 		setRotY(rotY, i);
 		setRotX(rotX, i);
 		multiplyMat3d(mTemp, rotZ, rotY);
-		multiplyMat3d(o.mat, rotX, mTemp);
+		multiplyMat3d(o.mat, rotX, mTemp); */
+
+		setRotZ(rotZ, i);
+		setIdentity(rotX);
+		multiplyMat3d(o.mat, rotZ, rotX);
 
 		if(kbhit())
 		{
@@ -140,16 +144,21 @@ int main()
 
 			if(c == 'q')
 				break;
-
-			if(c == 'p' && o.indexCount >= 3)
+			else if(c == 'p' && o.indexCount >= 3)
 				o.indexCount -= 3;
-			else if(c == 'o' && o.indexCount < maxIndices - 3)
+			else if(c == 'o' && o.indexCount <= maxIndices - 3)
 				o.indexCount += 3;
-
-			if(c == 'w')
+			else if(c == 'w')
 				o.pos.z += FX_ONE;
 			else if(c == 's')
 				o.pos.z -= FX_ONE;
+			else if(c == 'j')
+				step --;
+			else if(c == 'k')
+				step ++;
+			else if(c == 'l')
+				i ++;
+
 		}
 
 		tick++;

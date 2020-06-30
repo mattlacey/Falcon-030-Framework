@@ -260,7 +260,7 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 	}
 #endif
 
-	for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
+	for(i = 3, j = 1; i < pObj->indexCount; i+= 3, j++)
 	{
 		v1 = pObj->vertsX[pObj->indices[i + 0]];
 		v2 = pObj->vertsX[pObj->indices[i + 1]];
@@ -278,8 +278,7 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 		{
 			/* light needs to be in camera space too */
 #ifdef FACE_NORMALS
-/* 			fx32 light = dot(pObj->faceNormalsX[j], vLight); */
-			fx32 light = dot(vn, vLight);
+			fx32 light = dot(pObj->faceNormalsX[j], vLight);
 
 			/* 5 because we have 5 bits per channel */
 

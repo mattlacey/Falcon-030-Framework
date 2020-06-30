@@ -65,6 +65,10 @@ void renderTri(Tri t, void *pBuffer)
 	}
 
 	/* Is this correct? Do we only need to consider two cases? It's been a while... */
+/* 	Bug is here! 
+
+Fails when top.y = mid.y, mid.x = bot.x, as soon as mid.x > bot.x then all good
+*/
 	if(mid->x <= bot->x)
 	{
 		calcSpanBounds(bounds[0], top->x, top->y, mid->x, mid->y);
@@ -93,6 +97,11 @@ void renderTri(Tri t, void *pBuffer)
 	renderLine(mid->x, mid->y, bot->x, bot->y, t.col, pBuffer);
 #endif
 
+#ifdef POINTS
+	renderPoint(top->x, top->y, YEL, pBuffer);
+	renderPoint(mid->x, mid->y, MAG, pBuffer);
+	renderPoint(bot->x, bot->y, CYN, pBuffer);
+#endif
 }
 
 void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
@@ -183,4 +192,9 @@ void renderLine(long x1, long y1, long x2, long y2, unsigned col, void *pBuffer)
 			yoffset += 320;
 		}
 	}
+}
+
+void renderPoint(long x, long y, unsigned col, void *pBuffer)
+{
+	*((unsigned int*)pBuffer + x + (y * (long)320)) = col;
 }
