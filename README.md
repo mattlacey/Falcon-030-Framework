@@ -18,7 +18,7 @@ A basic C Framework / 3D engine for the Atari Falcon
 ## Lights
 
 - [ ] Point lights
-- [ ] Directional lights
+- [/] Directional lights
 
 ## Camera
 
@@ -35,7 +35,7 @@ A basic C Framework / 3D engine for the Atari Falcon
 
 - [ ] Screen clipping for wireframes
 - [ ] Screen clipping for rasters
-- [ ] Flat shading
+- [x] Flat shading
 - [ ] Per face colours
 - [x] Backface culling
 - [ ] Z-buffering

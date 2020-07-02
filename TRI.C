@@ -41,6 +41,7 @@ void renderTri(Tri t, void *pBuffer)
 	V3 *temp;
 
 	long bounds[2][240];
+	long *left, *right;
 	int i, iMin, iMax;
 
 	if(mid->y < top->y)
@@ -69,25 +70,36 @@ void renderTri(Tri t, void *pBuffer)
 
 Fails when top.y = mid.y, mid.x = bot.x, as soon as mid.x > bot.x then all good
 */
-	if(mid->x <= bot->x)
+	if(top->y != mid ->y)
 	{
 		calcSpanBounds(bounds[0], top->x, top->y, mid->x, mid->y);
-		calcSpanBounds(bounds[0], mid->x, mid->y, bot->x, bot->y);
-		calcSpanBounds(bounds[1], top->x, top->y, bot->x, bot->y);
 	}
-	else
+
+	if(mid->y != bot->y)
 	{
-		calcSpanBounds(bounds[1], top->x, top->y, mid->x, mid->y);
-		calcSpanBounds(bounds[1], mid->x, mid->y, bot->x, bot->y);
-		calcSpanBounds(bounds[0], top->x, top->y, bot->x, bot->y);
+		calcSpanBounds(bounds[0], mid->x, mid->y, bot->x, bot->y);
 	}
+
+	calcSpanBounds(bounds[1], top->x, top->y, bot->x, bot->y);
 
 #ifdef FILL
 	iMin = top->y < 0 ? 0 : top->y;
 	iMax = bot->y >= 240 ? 239 : bot->y;
+
+	if(bounds[0][mid->y] < bounds[1][mid->y])
+	{
+		left = bounds[0];
+		right = bounds[1];
+	}
+	else
+	{
+		left = bounds[1];
+		right = bounds[0];
+	}
+
 	for(i = iMin; i < iMax; i++)
 	{
-		renderSpan(bounds[0][i], bounds[1][i], i, t.col, pBuffer);
+		renderSpan(left[i], right[i], i, t.col, pBuffer);
 	}
 #endif
 

@@ -234,7 +234,7 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 	}
 }
 
-void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
+void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 {
 	int i = 0, j = 0;
 	unsigned int col = 0;
@@ -243,14 +243,14 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 
 	/* Extract this from the camera matrix z component */
 	vCam = Vec3(0, 0, FX_ONE);
-	vLight = Vec3(FX_ONE, FX_ONE, - FX_ONE);
+	vLight = Vec3(FX_ONE, FX_ONE, - 2 * FX_ONE);
 	normalize(&vLight);
 
 	for(i = 0; i < pObj->vertCount; i++)
 	{
 		v1 = V3xMat3d(pObj->verts[i], pObj->mat);
 		v1 = addVec3(v1, pObj->pos);
-		pObj->vertsX[i] = V3xMat3dHom(v1, cam);
+		pObj->vertsX[i] = V3xMat3dHom(v1, projection);
 	}
 
 #ifdef FACE_NORMALS
@@ -260,7 +260,7 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 	}
 #endif
 
-	for(i = 3, j = 1; i < pObj->indexCount; i+= 3, j++)
+	for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
 	{
 		v1 = pObj->vertsX[pObj->indices[i + 0]];
 		v2 = pObj->vertsX[pObj->indices[i + 1]];
@@ -271,7 +271,6 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 
 		vn = cross(ve2, ve1);
 
-		/* Not needed yet, but will be needed for lighting etc */
 		normalize(&vn);
 	
 		if(dot(vn, vCam) <= 0)
@@ -288,7 +287,7 @@ void renderObject(Obj *pObj, Mat3d cam, void* pBuffer)
 			}
 			else
 			{
-				col = GRN;
+				col = 0;
 			}
 #else
 			col += 0xff;

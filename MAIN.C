@@ -51,7 +51,7 @@ int main()
 	fx32 fxtemp;
 
 	V3 v, v1;
-	Mat3d cam;
+	Mat3d projection;
 	Mat3d rotX;
 	Mat3d rotY;
 	Mat3d rotZ;
@@ -69,11 +69,11 @@ int main()
 	prevLogBase = Logbase();
 	prevPhyBase = Physbase();
 
-	setProjection(cam);
+	setProjection(projection);
 
 	if(CUBE)
 	{
-		o = loadObj("DATA/SQUARE.OBJ");
+		o = loadObj("DATA/ICO.OBJ");
 		o.pos = Vec3(0, 0, FX_ONE * 8);
 	}
 	else
@@ -119,24 +119,25 @@ int main()
 
 	/*	renderBG(current); */
 		memset(current, 0x00, screenSize);
-		renderObject(&o, cam, current);
+		renderObject(&o, projection, current);
 
 		i += step;
 
-		if(i == 360)
+		if(i >= 360)
 		{
 			i = 0;
 		}
 
-/* 		setRotZ(rotZ, i);
+		setRotZ(rotZ, i);
 		setRotY(rotY, i);
 		setRotX(rotX, i);
 		multiplyMat3d(mTemp, rotZ, rotY);
-		multiplyMat3d(o.mat, rotX, mTemp); */
-
+		multiplyMat3d(o.mat, rotX, mTemp);
+/*
 		setRotZ(rotZ, i);
 		setIdentity(rotX);
 		multiplyMat3d(o.mat, rotZ, rotX);
+*/
 
 		if(kbhit())
 		{
@@ -168,7 +169,7 @@ int main()
 
 #endif
 
-/* 	renderObjectDebug(&o, cam);
+/* 	renderObjectDebug(&o, projection);
 	printf("\nPress a key to continue...\n");
 	while(!kbhit()); */
 
