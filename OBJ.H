@@ -28,6 +28,7 @@ typedef struct
 
 void loadTest(void);
 Obj loadObj(char * filename);
+void freeObj(Obj* pObj);
 void renderObjectDebug(Obj *pObj, Mat3d cam);
 void renderObject(Obj *pObj, Mat3d projection, void* pBuffer);
 

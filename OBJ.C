@@ -84,7 +84,10 @@ Obj loadObj(char * filename)
 
 	while(fgets(line, INPUT_BUFFER_SIZE, f))
 	{
-		sscanf(line, "%s", input);
+		if (sscanf(line, "%s", input) == EOF)
+		{
+			continue;
+		}
 
 		if(strcmp(input, "v") == 0)
 		{
@@ -168,6 +171,20 @@ Obj loadObj(char * filename)
 
 	return o;
 }
+
+void freeObj(Obj* pObj)
+{
+	/* todo: check for leaks */
+	free(pObj->verts);
+	free(pObj->vertsX);
+	free(pObj->indices);
+
+#ifdef FACE_NORMALS
+	free(pObj->faceNormals);
+	free(pObj->faceNormalsX);
+#endif
+}
+
 
 void renderObjectDebug(Obj *pObj, Mat3d cam)
 {
