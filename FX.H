@@ -1,7 +1,13 @@
 #ifndef _FX_H_
 #define _FX_H_
 
+#ifdef _WIN32
 typedef long fx32;
+
+#define M_PI	3.14159265358979
+#else
+typedef long fx32;
+#endif
 
 #define FX_SHIFT (16)
 #define FX_SIZE (32)
