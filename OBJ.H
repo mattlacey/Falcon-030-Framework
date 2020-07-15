@@ -8,18 +8,43 @@
 #include "VECTOR.H"
 #include "MATRIX.h"
 
-typedef struct
+typedef struct BSPPlane
 {
-	V3 * verts;
-	V3 * vertsX;
-#ifdef FACE_NORMALS
-	V3 * faceNormals;
-	V3 * faceNormalsX;
-#endif
-	long vertCount;
+	int orientation; // 0 = x, 1 = y, 2 = z
+	fx32 distance;
+} BSPPlane;
+
+typedef struct ObjPart
+{
 	long * indices;
 	long indexCount;
 	long faceCount;
+} ObjPart;
+
+typedef struct ObjNode
+{
+	ObjPart* pPart;
+	BSPPlane hyperplane;
+	struct ObjNode* pLeft;
+	struct ObjNode* pRight;
+} ObjNode;
+
+typedef struct Obj
+{
+	V3* verts;
+	V3* vertsX;
+	long vertCount;
+
+	long* indices;
+	long indexCount;
+	long faceCount;
+
+#ifdef FACE_NORMALS
+	V3* faceNormals;
+	V3* faceNormalsX;
+#endif
+
+	ObjNode* pRootNode;
 
 	V3 pos;
 	Mat3d mat;

@@ -42,7 +42,7 @@ Obj loadObj(char * filename)
 	char input[INPUT_BUFFER_SIZE];
 	char line[INPUT_BUFFER_SIZE];
 	char floats[4][32];
-	long indices[3];
+	long indices[4];
 
 	V3 v1, v2, v3;
 
@@ -61,9 +61,9 @@ Obj loadObj(char * filename)
 	}
 
 	/* grab the vertex and face counts */
-	while(fgets(input, INPUT_BUFFER_SIZE, f))
+	while(fgets(line, INPUT_BUFFER_SIZE, f))
 	{
-		sscanf(input, "%s", input);
+		sscanf(line, "%s", input);
 
 		if(strcmp(input, "v") == 0)
 		{
@@ -71,8 +71,14 @@ Obj loadObj(char * filename)
 		}
 		else if(strcmp(input, "f") == 0)
 		{
-			/* each face uses 3 indices... need to switch to storing triangles */
-			o.indexCount += 3;
+			scanCount = sscanf(line, "%*s %ld/%*s %ld/%*s %ld/%*s %ld/%*s", &indices[0], &indices[1], &indices[2], &indices[3]);
+
+			if(scanCount == 1)
+			{
+				scanCount = sscanf(line, "%*s %ld %ld %ld", &indices[0], &indices[1], &indices[2]);
+			}
+
+			o.indexCount += (scanCount == 3 ? 3 : 6);
 		}
 	}
 
@@ -99,8 +105,8 @@ Obj loadObj(char * filename)
 		}
 		else if(strcmp(input, "f") == 0)
 		{
-			/* try vert/tex/normal format first */
-			scanCount = sscanf(line, "%*s %ld/%*s %ld/%*s %ld/%*s", &indices[0], &indices[1], &indices[2]);
+			/* try vert/tex/normal format first, with 4 faces */
+			scanCount = sscanf(line, "%*s %ld/%*s %ld/%*s %ld/%*s %ld/%*s", &indices[0], &indices[1], &indices[2], &indices[3]);
 
 			if(scanCount == 1)
 			{
@@ -111,10 +117,24 @@ Obj loadObj(char * filename)
 			o.indices[currentIndex] = indices[0] - 1;
 			o.indices[currentIndex + 1] = indices[1] - 1;
 			o.indices[currentIndex + 2] = indices[2] - 1;
+
 			currentIndex += 3;
 			o.faceCount++;
+
+			/* if we found a quad we need to add another triangle */
+			if (scanCount == 4)
+			{
+				o.indices[currentIndex] = indices[0] - 1;
+				o.indices[currentIndex + 1] = indices[2] - 1;
+				o.indices[currentIndex + 2] = indices[3] - 1;
+
+				currentIndex += 3;
+				o.faceCount++;
+			}
 		}
 	}
+
+	o.indexCount = currentIndex;
 
 	fclose(f);
 
