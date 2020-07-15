@@ -65,11 +65,6 @@ void renderTri(Tri t, void *pBuffer)
 		mid = temp;
 	}
 
-	/* Is this correct? Do we only need to consider two cases? It's been a while... */
-/* 	Bug is here! 
-
-Fails when top.y = mid.y, mid.x = bot.x, as soon as mid.x > bot.x then all good
-*/
 	if(top->y != mid ->y)
 	{
 		calcSpanBounds(bounds[0], top->x, top->y, mid->x, mid->y);
@@ -104,9 +99,9 @@ Fails when top.y = mid.y, mid.x = bot.x, as soon as mid.x > bot.x then all good
 #endif
 
 #ifdef WIREFRAME
-	renderLine(top->x, top->y, bot->x, bot->y, t.col, pBuffer);
-	renderLine(top->x, top->y, mid->x, mid->y, t.col, pBuffer);
-	renderLine(mid->x, mid->y, bot->x, bot->y, t.col, pBuffer);
+	renderLine(top->x, top->y, bot->x, bot->y, GRN, pBuffer);
+	renderLine(top->x, top->y, mid->x, mid->y, GRN, pBuffer);
+	renderLine(mid->x, mid->y, bot->x, bot->y, GRN, pBuffer);
 #endif
 
 #ifdef POINTS
