@@ -32,6 +32,7 @@ A basic C Framework / 3D engine for the Atari Falcon
 - [ ] Texture coordinates?
 
 # LTO Loader / Support
+- [ ] Add vertext data to file format
 - [ ] Add plane data to file format
 - [ ] Improve struct initialisation
 - [ ] Tree rendering support
