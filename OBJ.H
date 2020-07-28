@@ -2,6 +2,7 @@
 #define _OBJ_H
 
 #define FACE_NORMALS 1
+#define BRANCH_NODE 0xffffffff
 /* #define DEBUG_LOADER 1 */
 
 #include "TRI.H"
@@ -10,14 +11,20 @@
 
 typedef struct BSPPlane
 {
-	int orientation; // 0 = x, 1 = y, 2 = z
+	int orientation; /* 0 = x, 1 = y, 2 = z */
 	fx32 distance;
 } BSPPlane;
 
+typedef struct ObjFace
+{
+	long v1;
+	long v2;
+	long v3;
+} ObjFace;
+
 typedef struct ObjPart
 {
-	long * indices;
-	long indexCount;
+	ObjFace* faces;
 	long faceCount;
 } ObjPart;
 
@@ -35,7 +42,12 @@ typedef struct Obj
 	V3* vertsX;
 	long vertCount;
 
-	long* indices;
+	union
+	{
+		long* indices;
+		ObjFace* faces;
+	};
+
 	long indexCount;
 	long faceCount;
 
@@ -53,6 +65,7 @@ typedef struct Obj
 
 void loadTest(void);
 Obj loadObj(char * filename);
+Obj loadTree(char* filename);
 void freeObj(Obj* pObj);
 void renderObjectDebug(Obj *pObj, Mat3d cam);
 void renderObject(Obj *pObj, Mat3d projection, void* pBuffer);

@@ -192,6 +192,60 @@ Obj loadObj(char * filename)
 	return o;
 }
 
+void loadTreeNode(FILE* pFile, ObjNode** ppNode)
+{
+	long current;
+	size_t count;
+	count = fread(&current, sizeof(long), 1, pFile);
+	ObjNode* pNode;
+
+	if (count != 1)
+	{
+		return;
+	}
+	
+	pNode = malloc(sizeof(ObjNode));
+	*ppNode = pNode;
+
+	if (current == BRANCH_NODE)
+	{
+		pNode->pLeft = 0;
+		pNode->pRight = 0;
+
+		loadTreeNode(pFile, &pNode->pLeft);
+		loadTreeNode(pFile, &pNode->pRight);
+	}
+	else
+	{
+		pNode->pPart = malloc(sizeof(ObjPart));
+		pNode->pPart->faceCount = current;
+		pNode->pPart->faces = malloc(current * sizeof(ObjFace));
+
+		count = fread(pNode->pPart->faces, sizeof(ObjFace), current, pFile);
+	}
+}
+
+Obj loadTree(char* filename)
+{
+	Obj o;
+	FILE* pFile = fopen(filename, "rb");
+
+	if (!pFile)
+	{
+		printf("Failed to open file: %s\n", filename);
+		o.indexCount = o.faceCount = 0;
+		return o;
+	}
+
+	loadTreeNode(pFile, &o.pRootNode);
+
+	fclose(pFile);
+
+	return o;
+}
+
+
+
 void freeObj(Obj* pObj)
 {
 	/* todo: check for leaks */

@@ -31,6 +31,11 @@ A basic C Framework / 3D engine for the Atari Falcon
 - [ ] Vertex normals?
 - [ ] Texture coordinates?
 
+# LTO Loader / Support
+- [ ] Add plane data to file format
+- [ ] Improve struct initialisation
+- [ ] Tree rendering support
+
 ## Renderer
 
 - [ ] Screen clipping for wireframes
