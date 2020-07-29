@@ -11,7 +11,7 @@
 
 typedef struct BSPPlane
 {
-	int orientation; /* 0 = x, 1 = y, 2 = z */
+	long orientation; /* 0 = x, 1 = y, 2 = z */
 	fx32 distance;
 } BSPPlane;
 

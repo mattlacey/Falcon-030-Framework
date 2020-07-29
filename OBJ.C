@@ -63,7 +63,10 @@ Obj loadObj(char * filename)
 	/* grab the vertex and face counts */
 	while(fgets(line, INPUT_BUFFER_SIZE, f))
 	{
-		sscanf(line, "%s", input);
+		if (sscanf(line, "%s", input) == EOF)
+		{
+			continue;
+		}
 
 		if(strcmp(input, "v") == 0)
 		{
@@ -211,6 +214,7 @@ void loadTreeNode(FILE* pFile, ObjNode** ppNode)
 	{
 		pNode->pLeft = 0;
 		pNode->pRight = 0;
+		fread(&pNode->hyperplane, sizeof(BSPPlane), 1, pFile);
 
 		loadTreeNode(pFile, &pNode->pLeft);
 		loadTreeNode(pFile, &pNode->pRight);
