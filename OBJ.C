@@ -197,9 +197,9 @@ Obj loadObj(char * filename)
 
 void loadTreeNode(FILE* pFile, ObjNode** ppNode)
 {
-	long current;
+	unsigned long current;
 	size_t count;
-	count = fread(&current, sizeof(long), 1, pFile);
+	count = fread(&current, sizeof(unsigned long), 1, pFile);
 	ObjNode* pNode;
 
 	if (count != 1)
@@ -214,6 +214,7 @@ void loadTreeNode(FILE* pFile, ObjNode** ppNode)
 	{
 		pNode->pLeft = 0;
 		pNode->pRight = 0;
+		pNode->pPart = 0;
 		fread(&pNode->hyperplane, sizeof(BSPPlane), 1, pFile);
 
 		loadTreeNode(pFile, &pNode->pLeft);
@@ -233,6 +234,8 @@ Obj loadTree(char* filename)
 {
 	Obj o;
 	FILE* pFile = fopen(filename, "rb");
+	char buffer[256];
+	unsigned char version;
 
 	if (!pFile)
 	{
@@ -241,7 +244,22 @@ Obj loadTree(char* filename)
 		return o;
 	}
 
-	loadTreeNode(pFile, &o.pRootNode);
+	fread(buffer, 1, 3, pFile);
+	fread(&version, 1, 1, pFile);
+
+	if (version != 1)
+	{
+		o.vertCount = -1;
+	}
+	else
+	{
+		fread(&o.vertCount, sizeof(long), 1, pFile);
+		o.verts = malloc(sizeof(V3) * o.vertCount);
+		o.vertsX = malloc(sizeof(V3) * o.vertCount);
+		fread(&o.verts, sizeof(V3), o.vertCount, pFile);
+
+		loadTreeNode(pFile, &o.pRootNode);
+	}
 
 	fclose(pFile);
 
