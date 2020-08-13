@@ -73,7 +73,7 @@ int main()
 
 	if(CUBE)
 	{
-		o = loadObj("DATA/ICO.OBJ");
+		o = loadObj("DATA/CUBE.LTO");
 		o.pos = Vec3(0, 0, FX_ONE * 8);
 	}
 	else
@@ -167,11 +167,11 @@ int main()
 
 	xbios(5, prevLogBase, prevPhyBase, 3, prevMode);
 
-#endif
-
-/* 	renderObjectDebug(&o, projection);
+#else
+	renderObjectDebug(&o, projection);
 	printf("\nPress a key to continue...\n");
-	while(!kbhit()); */
+	while(!kbhit());
+#endif
 
 	free(buffers[0]);
 	free(buffers[1]);

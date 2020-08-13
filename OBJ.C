@@ -195,12 +195,13 @@ Obj loadObj(char * filename)
 	return o;
 }
 
-void loadTreeNode(FILE* pFile, ObjNode** ppNode)
+void loadTreeNode(FILE* pFile, struct ObjNode** ppNode)
 {
 	unsigned long current;
 	size_t count;
-	count = fread(&current, sizeof(unsigned long), 1, pFile);
 	ObjNode* pNode;
+	count = fread(&current, sizeof(unsigned long), 1, pFile);
+
 
 	if (count != 1)
 	{
@@ -281,6 +282,46 @@ void freeObj(Obj* pObj)
 #endif
 }
 
+void renderNodeDebug(Obj* pObj, ObjNode* pNode, V3* pvCam)
+{
+	long i;
+	unsigned int col = 0;
+	V3 v1, v2, v3, vn, ve1, ve2;
+	Tri tx;
+
+	if (pNode->pPart)
+	{
+		for (i = 0; i < pNode->pPart->faceCount; i++)
+		{
+			v1 = pObj->vertsX[pNode->pPart->faces[i].v1];
+			v2 = pObj->vertsX[pNode->pPart->faces[i].v2];
+			v3 = pObj->vertsX[pNode->pPart->faces[i].v3];
+
+			printf("Face %ld: %ld, %ld, %ld\n", i, pNode->pPart->faces[i].v1, pNode->pPart->faces[i].v2, pNode->pPart->faces[i].v3);
+
+			ve1 = subVec3(v1, v2);
+			ve2 = subVec3(v3, v2);
+
+			vn = cross(ve2, ve1);
+
+			normalize(&vn);
+
+			if (dot(vn, *pvCam) <= 0)
+			{
+				tx = makeTri(v1, v2, v3, col);
+				triToScreen(&tx);
+				printTri(&tx);
+			}
+		}
+	}
+	else
+	{
+		printf("Left\n");
+		renderNodeDebug(pObj, pNode->pLeft, pvCam);
+		printf("Right\n");
+		renderNodeDebug(pObj, pNode->pRight, pvCam);
+	}
+}
 
 void renderObjectDebug(Obj *pObj, Mat3d cam)
 {
@@ -301,48 +342,55 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 		pObj->vertsX[i] = V3xMat3dHom(v1, cam);
 	}
 
-	printf("Drawing faces...\n");
-
-	for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
+	if(pObj->pRootNode)
 	{
-		col += 4096;
+		renderNodeDebug(pObj, pObj->pRootNode, &vCam);
+	}
+	else
+	{
+		printf("Drawing faces...\n");
 
-		v1 = pObj->vertsX[pObj->indices[i + 0]];
-		v2 = pObj->vertsX[pObj->indices[i + 1]];
-		v3 = pObj->vertsX[pObj->indices[i + 2]];
-
-		printf("Face %ld\n", i);
-
-		ve1 = subVec3(v1, v2);
-		ve2 = subVec3(v3, v2);
-
-		ve1.x <<= 8;
-		ve1.y <<= 8;
-		ve1.z <<= 8;
-
-		ve2.x <<= 8;
-		ve2.y <<= 8;
-		ve2.z <<= 8;
-
-		printV3(ve1);
-		printV3(ve2);
-
-		vn = cross(ve2, ve1);
-
-		printf("CP: ");
-		printV3(vn);
-
-		/* Not needed yet, but will be needed for lighting etc */
-		normalize(&vn);
-
-		printf("Normalized: ");
-		printV3(vn);
-	
-		if(dot(vn, vCam) <= 0)
+		for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
 		{
-			tx = makeTri(v1, v2, v3, col);
-			triToScreen(&tx);
-			printTri(&tx);
+			col += 4096;
+
+			v1 = pObj->vertsX[pObj->indices[i + 0]];
+			v2 = pObj->vertsX[pObj->indices[i + 1]];
+			v3 = pObj->vertsX[pObj->indices[i + 2]];
+
+			printf("Face %ld\n", i);
+
+			ve1 = subVec3(v1, v2);
+			ve2 = subVec3(v3, v2);
+
+			ve1.x <<= 8;
+			ve1.y <<= 8;
+			ve1.z <<= 8;
+
+			ve2.x <<= 8;
+			ve2.y <<= 8;
+			ve2.z <<= 8;
+
+			printV3(ve1);
+			printV3(ve2);
+
+			vn = cross(ve2, ve1);
+
+			printf("CP: ");
+			printV3(vn);
+
+			/* Not needed yet, but will be needed for lighting etc */
+			normalize(&vn);
+
+			printf("Normalized: ");
+			printV3(vn);
+		
+			if(dot(vn, vCam) <= 0)
+			{
+				tx = makeTri(v1, v2, v3, col);
+				triToScreen(&tx);
+				printTri(&tx);
+			}
 		}
 	}
 }

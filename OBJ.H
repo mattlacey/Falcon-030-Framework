@@ -61,7 +61,9 @@ void loadTest(void);
 Obj loadObj(char * filename);
 Obj loadTree(char* filename);
 void freeObj(Obj* pObj);
+void renderNodeDebug(Obj* pObj, ObjNode* pNode, V3* pvCam);
 void renderObjectDebug(Obj *pObj, Mat3d cam);
+void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer);
 void renderObject(Obj *pObj, Mat3d projection, void* pBuffer);
 
 #endif
