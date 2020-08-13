@@ -41,12 +41,7 @@ typedef struct Obj
 	V3* vertsX;
 	long vertCount;
 
-	union
-	{
-		long* indices;
-		ObjFace* faces;
-	};
-
+	long* indices;
 	long indexCount;
 	long faceCount;
 
