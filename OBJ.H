@@ -2,7 +2,6 @@
 #define _OBJ_H
 
 #define FACE_NORMALS 1
-#define BRANCH_NODE 0xffffffff
 /* #define DEBUG_LOADER 1 */
 
 #include "TRI.H"

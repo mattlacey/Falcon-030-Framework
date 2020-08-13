@@ -210,7 +210,7 @@ void loadTreeNode(FILE* pFile, ObjNode** ppNode)
 	pNode = malloc(sizeof(ObjNode));
 	*ppNode = pNode;
 
-	if (current == BRANCH_NODE)
+	if (current == 0)
 	{
 		pNode->pLeft = 0;
 		pNode->pRight = 0;
@@ -347,6 +347,63 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 	}
 }
 
+void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer)
+{
+	long i;
+	unsigned int col;
+	V3 v1, v2, v3, vn, ve1, ve2;
+	Tri tx;
+
+	if (pNode->pPart)
+	{
+		for (i = 0; i < pNode->pPart->faceCount; i++)
+		{
+			v1 = pObj->vertsX[pNode->pPart->faces[i].v1];
+			v2 = pObj->vertsX[pNode->pPart->faces[i].v2];
+			v3 = pObj->vertsX[pNode->pPart->faces[i].v3];
+
+			ve1 = subVec3(v1, v2);
+			ve2 = subVec3(v3, v2);
+
+			vn = cross(ve2, ve1);
+
+			normalize(&vn);
+
+			if (dot(vn, *pvCam) <= 0)
+			{
+				/* light needs to be in camera space too */
+#ifdef FACE_NORMALS
+				fx32 light = dot(pObj->faceNormalsX[i], *pvLight);
+
+				/* 5 because we have 5 bits per channel */
+
+				if (light > 0)
+				{
+					col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
+				}
+				else
+				{
+					col = 0;
+				}
+#else
+				col += 0xff;
+#endif
+
+				col |= 0x01;
+
+				tx = makeTri(v1, v2, v3, col);
+				triToScreen(&tx);
+				renderTri(tx, pBuffer);
+			}
+		}
+	}
+	else
+	{
+		renderNode(pObj, pNode->pLeft, pvCam, pvLight, pBuffer);
+		renderNode(pObj, pNode->pRight, pvCam, pvLight, pBuffer);
+	}
+}
+
 void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 {
 	int i = 0, j = 0;
@@ -373,44 +430,52 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 	}
 #endif
 
-	for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
+	if (pObj->pRootNode)
 	{
-		v1 = pObj->vertsX[pObj->indices[i + 0]];
-		v2 = pObj->vertsX[pObj->indices[i + 1]];
-		v3 = pObj->vertsX[pObj->indices[i + 2]];
-
-		ve1 = subVec3(v1, v2);
-		ve2 = subVec3(v3, v2);
-
-		vn = cross(ve2, ve1);
-
-		normalize(&vn);
-	
-		if(dot(vn, vCam) <= 0)
+		renderNode(pObj, pObj->pRootNode, &vCam, &vLight, pBuffer);
+	}
+	else
+	{
+		for (i = 0, j = 0; i < pObj->indexCount; i += 3, j++)
 		{
-			/* light needs to be in camera space too */
+			v1 = pObj->vertsX[pObj->indices[i + 0]];
+			v2 = pObj->vertsX[pObj->indices[i + 1]];
+			v3 = pObj->vertsX[pObj->indices[i + 2]];
+
+			ve1 = subVec3(v1, v2);
+			ve2 = subVec3(v3, v2);
+
+			vn = cross(ve2, ve1);
+
+			normalize(&vn);
+
+			if (dot(vn, vCam) <= 0)
+			{
+				/* light needs to be in camera space too */
 #ifdef FACE_NORMALS
-			fx32 light = dot(pObj->faceNormalsX[j], vLight);
+				fx32 light = dot(pObj->faceNormalsX[j], vLight);
 
-			/* 5 because we have 5 bits per channel */
+				/* 5 because we have 5 bits per channel */
 
-			if(light > 0)
-			{
-				col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
-			}
-			else
-			{
-				col = 0;
-			}
+				if (light > 0)
+				{
+					col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
+				}
+				else
+				{
+					col = 0;
+				}
 #else
-			col += 0xff;
+				col += 0xff;
 #endif
 
-			col |= 0x01;
+				col |= 0x01;
 
-			tx = makeTri(v1, v2, v3, col);
-			triToScreen(&tx);
-			renderTri(tx, pBuffer);
+				tx = makeTri(v1, v2, v3, col);
+				triToScreen(&tx);
+				renderTri(tx, pBuffer);
+			}
 		}
 	}
 }
+
