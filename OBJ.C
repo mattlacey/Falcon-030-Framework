@@ -257,7 +257,7 @@ Obj loadTree(char* filename)
 		fread(&o.vertCount, sizeof(long), 1, pFile);
 		o.verts = malloc(sizeof(V3) * o.vertCount);
 		o.vertsX = malloc(sizeof(V3) * o.vertCount);
-		fread(&o.verts, sizeof(V3), o.vertCount, pFile);
+		fread(o.verts, sizeof(V3), o.vertCount, pFile);
 
 		loadTreeNode(pFile, &o.pRootNode);
 	}
