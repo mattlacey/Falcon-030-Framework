@@ -51,6 +51,7 @@ Obj loadObj(char * filename)
 	o.vertCount = 0;
 	o.indexCount = 0;
 	o.faceCount = 0;
+	o.pRootNode = NULL;
 
 	f = fopen(filename, "r");
 
@@ -238,6 +239,9 @@ Obj loadTree(char* filename)
 	char buffer[256];
 	unsigned char version;
 
+	o.pos = Vec3(0, 0, 0);
+	setIdentity(o.mat);
+
 	if (!pFile)
 	{
 		printf("Failed to open file: %s\n", filename);
@@ -298,7 +302,7 @@ void renderNodeDebug(Obj* pObj, ObjNode* pNode, V3* pvCam)
 			v3 = pObj->vertsX[pNode->pPart->faces[i].v3];
 
 			printf("Face %ld: %ld, %ld, %ld\n", i, pNode->pPart->faces[i].v1, pNode->pPart->faces[i].v2, pNode->pPart->faces[i].v3);
-
+/*
 			ve1 = subVec3(v1, v2);
 			ve2 = subVec3(v3, v2);
 
@@ -306,10 +310,10 @@ void renderNodeDebug(Obj* pObj, ObjNode* pNode, V3* pvCam)
 
 			normalize(&vn);
 
-			if (dot(vn, *pvCam) <= 0)
+			if (dot(vn, *pvCam) <= 0)*/
 			{
 				tx = makeTri(v1, v2, v3, col);
-				triToScreen(&tx);
+ 				triToScreen(&tx);
 				printTri(&tx);
 			}
 		}
@@ -371,19 +375,19 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 			ve2.y <<= 8;
 			ve2.z <<= 8;
 
-			printV3(ve1);
-			printV3(ve2);
+/* 			printV3(ve1);
+			printV3(ve2); */
 
 			vn = cross(ve2, ve1);
 
-			printf("CP: ");
-			printV3(vn);
+/* 			printf("CP: ");
+			printV3(vn); */
 
 			/* Not needed yet, but will be needed for lighting etc */
 			normalize(&vn);
 
-			printf("Normalized: ");
-			printV3(vn);
+/* 			printf("Normalized: ");
+			printV3(vn); */
 		
 			if(dot(vn, vCam) <= 0)
 			{
