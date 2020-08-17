@@ -196,13 +196,15 @@ Obj loadObj(char * filename)
 	return o;
 }
 
-void loadTreeNode(FILE* pFile, struct ObjNode** ppNode)
+void loadTreeNode(FILE* pFile, Obj* pObj, struct ObjNode** ppNode)
 {
 	unsigned long current;
 	size_t count;
 	ObjNode* pNode;
-	count = fread(&current, sizeof(unsigned long), 1, pFile);
+	long i;
+	V3 v1, v2, v3;
 
+	count = fread(&current, sizeof(unsigned long), 1, pFile);
 
 	if (count != 1)
 	{
@@ -219,14 +221,36 @@ void loadTreeNode(FILE* pFile, struct ObjNode** ppNode)
 		pNode->pPart = 0;
 		fread(&pNode->hyperplane, sizeof(BSPPlane), 1, pFile);
 
-		loadTreeNode(pFile, &pNode->pLeft);
-		loadTreeNode(pFile, &pNode->pRight);
+		loadTreeNode(pFile, pObj, &pNode->pLeft);
+		loadTreeNode(pFile, pObj, &pNode->pRight);
 	}
 	else
 	{
 		pNode->pPart = malloc(sizeof(ObjPart));
 		pNode->pPart->faceCount = current;
 		pNode->pPart->faces = malloc(current * sizeof(ObjFace));
+
+#ifdef FACE_NORMALS
+		pNode->pPart->faceNormals = malloc(sizeof(V3) * pNode->pPart->faceCount);
+		pNode->pPart->faceNormalsX = malloc(sizeof(V3) * pNode->pPart->faceCount);
+
+		for(i = 0; i < pNode->pPart->faceCount; i++)
+		{
+			v1 = pObj->verts[pNode->pPart->faces[i].v1];
+			v2 = pObj->verts[pNode->pPart->faces[i].v2];
+			v3 = pObj->verts[pNode->pPart->faces[i].v3];
+
+			v1 = subVec3(v1, v2);
+			normalize(&v1);
+
+			v3 = subVec3(v3, v2);
+			normalize(&v3);
+
+			v2 = cross(v3, v1);
+			normalize(&v2);
+			pNode->pPart->faceNormals[i] = v2;
+		}
+#endif
 
 		count = fread(pNode->pPart->faces, sizeof(ObjFace), current, pFile);
 	}
@@ -263,7 +287,7 @@ Obj loadTree(char* filename)
 		o.vertsX = malloc(sizeof(V3) * o.vertCount);
 		fread(o.verts, sizeof(V3), o.vertCount, pFile);
 
-		loadTreeNode(pFile, &o.pRootNode);
+		loadTreeNode(pFile, &o, &o.pRootNode);
 	}
 
 	fclose(pFile);
@@ -275,14 +299,19 @@ Obj loadTree(char* filename)
 
 void freeObj(Obj* pObj)
 {
-	/* todo: check for leaks */
+	/* todo:
+		[ ] check for leaks
+		[ ] update this for trees
+	 */
 	free(pObj->verts);
 	free(pObj->vertsX);
 	free(pObj->indices);
 
 #ifdef FACE_NORMALS
 	free(pObj->faceNormals);
-	free(pObj->faceNormalsX);
+
+	if(!pObj->pRootNode)
+		free(pObj->faceNormalsX);
 #endif
 }
 
@@ -402,7 +431,7 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer)
 {
 	long i;
-	unsigned int col;
+	unsigned int col = 0;
 	V3 v1, v2, v3, vn, ve1, ve2;
 	Tri tx;
 
@@ -413,7 +442,7 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 			v1 = pObj->vertsX[pNode->pPart->faces[i].v1];
 			v2 = pObj->vertsX[pNode->pPart->faces[i].v2];
 			v3 = pObj->vertsX[pNode->pPart->faces[i].v3];
-
+/*
 			ve1 = subVec3(v1, v2);
 			ve2 = subVec3(v3, v2);
 
@@ -421,11 +450,11 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 
 			normalize(&vn);
 
-			if (dot(vn, *pvCam) <= 0)
+			if (dot(vn, *pvCam) <= 0)*/
 			{
 				/* light needs to be in camera space too */
 #ifdef FACE_NORMALS
-				fx32 light = dot(pObj->faceNormalsX[i], *pvLight);
+				fx32 light = (FX_ONE - 1);/* dot(pObj->faceNormalsX[i], *pvLight);*/
 
 				/* 5 because we have 5 bits per channel */
 
@@ -438,7 +467,7 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 					col = 0;
 				}
 #else
-				col += 0xff;
+				col = 0xffff;
 #endif
 
 				col |= 0x01;
@@ -476,9 +505,12 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 	}
 
 #ifdef FACE_NORMALS
-	for(i = 0; i < pObj->faceCount; i++)
+	if(!pObj->pRootNode)
 	{
-		pObj->faceNormalsX[i] = V3xMat3d(pObj->faceNormals[i], pObj->mat);
+		for(i = 0; i < pObj->faceCount; i++)
+		{
+			pObj->faceNormalsX[i] = V3xMat3d(pObj->faceNormals[i], pObj->mat);
+		}
 	}
 #endif
 
@@ -503,9 +535,14 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 
 			if (dot(vn, vCam) <= 0)
 			{
-				/* light needs to be in camera space too */
 #ifdef FACE_NORMALS
+				/* light needs to be in camera space too */
 				fx32 light = dot(pObj->faceNormalsX[j], vLight);
+
+				/* look at multiplying the light by the inverse of the
+				  object matrix and using the normals unmodified. Then add
+				  to the tree rendering about
+				*/
 
 				/* 5 because we have 5 bits per channel */
 
