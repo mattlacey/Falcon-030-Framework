@@ -16,6 +16,7 @@ void setRotZ(Mat3d out, long angle);
 
 void multiplyMat3d(Mat3d out, Mat3d m1, Mat3d m2);
 V3 V3xMat3d(V3 v, Mat3d m);
+V3 V3xMat3dTransposed(V3 v, Mat3d m);
 V3 V3xMat3dHom(V3 v, Mat3d m);
 
 #endif

@@ -98,6 +98,15 @@ V3 V3xMat3d(V3 v, Mat3d m)
 	return out;
 }
 
+V3 V3xMat3dTransposed(V3 v, Mat3d m)
+{
+	V3 out;
+	out.x = FX_MUL(v.x, m[0][0]) + FX_MUL(v.y, m[0][1]) + FX_MUL(v.z, m[0][2]) + m[0][3];
+	out.y = FX_MUL(v.x, m[1][0]) + FX_MUL(v.y, m[1][1]) + FX_MUL(v.z, m[1][2]) + m[1][3];
+	out.z = FX_MUL(v.x, m[2][0]) + FX_MUL(v.y, m[2][1]) + FX_MUL(v.z, m[2][2]) + m[2][3];
+	return out;
+}
+
 V3 V3xMat3dHom(V3 v, Mat3d m)
 {
 	fx32 w;

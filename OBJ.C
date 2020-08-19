@@ -144,7 +144,6 @@ Obj loadObj(char * filename)
 
 #ifdef FACE_NORMALS
 	o.faceNormals = malloc(sizeof(V3) * o.faceCount);
-	o.faceNormalsX = malloc(sizeof(V3) * o.faceCount);
 
 	for(currentNormal = 0, currentIndex = 0; currentNormal < o.faceCount; currentNormal++, currentIndex += 3)
 	{
@@ -232,7 +231,6 @@ void loadTreeNode(FILE* pFile, Obj* pObj, struct ObjNode** ppNode)
 
 #ifdef FACE_NORMALS
 		pNode->pPart->faceNormals = malloc(sizeof(V3) * pNode->pPart->faceCount);
-		pNode->pPart->faceNormalsX = malloc(sizeof(V3) * pNode->pPart->faceCount);
 
 		for(i = 0; i < pNode->pPart->faceCount; i++)
 		{
@@ -309,9 +307,6 @@ void freeObj(Obj* pObj)
 
 #ifdef FACE_NORMALS
 	free(pObj->faceNormals);
-
-	if(!pObj->pRootNode)
-		free(pObj->faceNormalsX);
 #endif
 }
 
@@ -442,7 +437,7 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 			v1 = pObj->vertsX[pNode->pPart->faces[i].v1];
 			v2 = pObj->vertsX[pNode->pPart->faces[i].v2];
 			v3 = pObj->vertsX[pNode->pPart->faces[i].v3];
-/*
+
 			ve1 = subVec3(v1, v2);
 			ve2 = subVec3(v3, v2);
 
@@ -450,15 +445,19 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 
 			normalize(&vn);
 
-			if (dot(vn, *pvCam) <= 0)*/
+			if (dot(vn, *pvCam) <= 0)
 			{
-				/* light needs to be in camera space too */
 #ifdef FACE_NORMALS
-				fx32 light = (FX_ONE - 1);/* dot(pObj->faceNormalsX[i], *pvLight);*/
+				fx32 light = dot(pNode->pPart->faceNormals[i], *pvLight);
+
 
 				/* 5 because we have 5 bits per channel */
 
-				if (light > 0)
+				if(light == FX_ONE)
+				{
+					col = BLU;
+				}
+				else if (light > 0)
 				{
 					col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
 				}
@@ -505,13 +504,7 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 	}
 
 #ifdef FACE_NORMALS
-	if(!pObj->pRootNode)
-	{
-		for(i = 0; i < pObj->faceCount; i++)
-		{
-			pObj->faceNormalsX[i] = V3xMat3d(pObj->faceNormals[i], pObj->mat);
-		}
-	}
+	vLight = V3xMat3dTransposed(vLight, pObj->mat);
 #endif
 
 	if (pObj->pRootNode)
@@ -536,16 +529,9 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 			if (dot(vn, vCam) <= 0)
 			{
 #ifdef FACE_NORMALS
-				/* light needs to be in camera space too */
-				fx32 light = dot(pObj->faceNormalsX[j], vLight);
-
-				/* look at multiplying the light by the inverse of the
-				  object matrix and using the normals unmodified. Then add
-				  to the tree rendering about
-				*/
+				fx32 light = dot(pObj->faceNormals[j], vLight);
 
 				/* 5 because we have 5 bits per channel */
-
 				if (light == FX_ONE)
 				{
 					col = BLU;

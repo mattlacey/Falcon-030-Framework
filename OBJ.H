@@ -24,7 +24,6 @@ typedef struct ObjFace
 typedef struct ObjPart
 {
 	V3* faceNormals;
-	V3* faceNormalsX;
 	ObjFace* faces;
 	long faceCount;
 } ObjPart;
