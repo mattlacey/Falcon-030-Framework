@@ -494,7 +494,7 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 
 	/* Extract this from the camera matrix z component */
 	vCam = Vec3(0, 0, FX_ONE);
-	vLight = Vec3(FX_ONE, FX_ONE, - 2 * FX_ONE);
+	vLight = Vec3(0, 0, - FX_ONE);
 	normalize(&vLight);
 
 	for(i = 0; i < pObj->vertCount; i++)
@@ -546,7 +546,11 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 
 				/* 5 because we have 5 bits per channel */
 
-				if (light > 0)
+				if (light == FX_ONE)
+				{
+					col = BLU;
+				}
+				else if (light > 0)
 				{
 					col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
 				}

@@ -73,8 +73,8 @@ int main()
 
 	if(CUBE)
 	{
-/*		o = loadObj("DATA/CUBE.OBJ");*/
- 		o = loadTree("DATA/CUBE.LTO");
+		o = loadObj("DATA/CUBE.OBJ");
+/* 		o = loadTree("DATA/CUBE.LTO");*/
 		o.pos = Vec3(0, 0, FX_ONE * 8);
 	}
 	else
