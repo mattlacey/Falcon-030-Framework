@@ -229,6 +229,8 @@ void loadTreeNode(FILE* pFile, Obj* pObj, struct ObjNode** ppNode)
 		pNode->pPart->faceCount = current;
 		pNode->pPart->faces = malloc(current * sizeof(ObjFace));
 
+		count = fread(pNode->pPart->faces, sizeof(ObjFace), current, pFile);
+
 #ifdef FACE_NORMALS
 		pNode->pPart->faceNormals = malloc(sizeof(V3) * pNode->pPart->faceCount);
 
@@ -249,8 +251,6 @@ void loadTreeNode(FILE* pFile, Obj* pObj, struct ObjNode** ppNode)
 			pNode->pPart->faceNormals[i] = v2;
 		}
 #endif
-
-		count = fread(pNode->pPart->faces, sizeof(ObjFace), current, pFile);
 	}
 }
 
@@ -325,8 +325,7 @@ void renderNodeDebug(Obj* pObj, ObjNode* pNode, V3* pvCam)
 			v2 = pObj->vertsX[pNode->pPart->faces[i].v2];
 			v3 = pObj->vertsX[pNode->pPart->faces[i].v3];
 
-			printf("Face %ld: %ld, %ld, %ld\n", i, pNode->pPart->faces[i].v1, pNode->pPart->faces[i].v2, pNode->pPart->faces[i].v3);
-/*
+
 			ve1 = subVec3(v1, v2);
 			ve2 = subVec3(v3, v2);
 
@@ -334,8 +333,12 @@ void renderNodeDebug(Obj* pObj, ObjNode* pNode, V3* pvCam)
 
 			normalize(&vn);
 
-			if (dot(vn, *pvCam) <= 0)*/
+			if (dot(vn, *pvCam) <= 0)
 			{
+				printf("Face %ld: %ld, %ld, %ld\n", i, pNode->pPart->faces[i].v1, pNode->pPart->faces[i].v2, pNode->pPart->faces[i].v3);
+				printf("Normal:\n");
+				printV3(pNode->pPart->faceNormals[i]);
+
 				tx = makeTri(v1, v2, v3, col);
  				triToScreen(&tx);
 				printTri(&tx);
@@ -344,9 +347,9 @@ void renderNodeDebug(Obj* pObj, ObjNode* pNode, V3* pvCam)
 	}
 	else
 	{
-		printf("Left\n");
+/* 		printf("Left\n"); */
 		renderNodeDebug(pObj, pNode->pLeft, pvCam);
-		printf("Right\n");
+/* 		printf("Right\n"); */
 		renderNodeDebug(pObj, pNode->pRight, pvCam);
 	}
 }
@@ -361,7 +364,7 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 	/* Extract this from the camera matrix z component */
 	vCam = Vec3(0, 0, FX_ONE);
 
-	printf("Translating verts...\n");
+/* 	printf("Translating verts...\n"); */
 
 	for(i = 0; i < pObj->vertCount; i++)
 	{
@@ -376,7 +379,7 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 	}
 	else
 	{
-		printf("Drawing faces...\n");
+/* 		printf("Drawing faces...\n"); */
 
 		for(i = 0, j = 0; i < pObj->indexCount; i+= 3, j++)
 		{
@@ -386,7 +389,7 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 			v2 = pObj->vertsX[pObj->indices[i + 1]];
 			v3 = pObj->vertsX[pObj->indices[i + 2]];
 
-			printf("Face %ld\n", i);
+			printf("Face %ld: %ld, %ld, %ld\n", j, pObj->indices[i + 0], pObj->indices[i + 1], pObj->indices[i + 2]);
 
 			ve1 = subVec3(v1, v2);
 			ve2 = subVec3(v3, v2);
@@ -399,22 +402,13 @@ void renderObjectDebug(Obj *pObj, Mat3d cam)
 			ve2.y <<= 8;
 			ve2.z <<= 8;
 
-/* 			printV3(ve1);
-			printV3(ve2); */
-
 			vn = cross(ve2, ve1);
-
-/* 			printf("CP: ");
-			printV3(vn); */
-
-			/* Not needed yet, but will be needed for lighting etc */
 			normalize(&vn);
-
-/* 			printf("Normalized: ");
-			printV3(vn); */
 		
 			if(dot(vn, vCam) <= 0)
 			{
+				printf("Normal:\n");
+				printV3(pObj->faceNormals[j]);
 				tx = makeTri(v1, v2, v3, col);
 				triToScreen(&tx);
 				printTri(&tx);
@@ -450,15 +444,13 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 #ifdef FACE_NORMALS
 				fx32 light = dot(pNode->pPart->faceNormals[i], *pvLight);
 
-
-				/* 5 because we have 5 bits per channel */
-
 				if(light == FX_ONE)
 				{
 					col = BLU;
 				}
 				else if (light > 0)
 				{
+					/* 5 because we have 5 bits per channel */
 					col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
 				}
 				else
@@ -479,8 +471,17 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 	}
 	else
 	{
-		renderNode(pObj, pNode->pLeft, pvCam, pvLight, pBuffer);
-		renderNode(pObj, pNode->pRight, pvCam, pvLight, pBuffer);
+		if(((fx32 *)pvCam)[pNode->hyperplane.orientation] <= pNode->hyperplane.distance)
+		{
+			renderNode(pObj, pNode->pLeft, pvCam, pvLight, pBuffer);
+			renderNode(pObj, pNode->pRight, pvCam, pvLight, pBuffer);
+		}
+		else
+		{
+			renderNode(pObj, pNode->pRight, pvCam, pvLight, pBuffer);
+			renderNode(pObj, pNode->pLeft, pvCam, pvLight, pBuffer);
+		}
+		
 	}
 }
 
@@ -531,13 +532,13 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 #ifdef FACE_NORMALS
 				fx32 light = dot(pObj->faceNormals[j], vLight);
 
-				/* 5 because we have 5 bits per channel */
 				if (light == FX_ONE)
 				{
 					col = BLU;
 				}
 				else if (light > 0)
 				{
+					/* 5 because we have 5 bits per channel */
 					col = (unsigned int)((light >> (FX_SHIFT - 5)) & BLU);
 				}
 				else

@@ -48,7 +48,6 @@ typedef struct Obj
 
 #ifdef FACE_NORMALS
 	V3* faceNormals;
-	V3* faceNormalsX;
 #endif
 
 	ObjNode* pRootNode;
