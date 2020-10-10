@@ -421,7 +421,7 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 {
 	long i;
 	unsigned int col = 0;
-	V3 v1, v2, v3, vn, ve1, ve2;
+	V3 v1, v2, v3, vn, ve1, ve2, fakeCam, objCam;
 	Tri tx;
 
 	if (pNode->pPart)
@@ -439,7 +439,7 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 
 			normalize(&vn);
 
-			if (dot(vn, *pvCam) <= 0)
+			if (NO_CULL || dot(vn, *pvCam) <= 0)
 			{
 #ifdef FACE_NORMALS
 				fx32 light = dot(pNode->pPart->faceNormals[i], *pvLight);
@@ -471,7 +471,20 @@ void renderNode(Obj* pObj, ObjNode* pNode, V3* pvCam, V3* pvLight, void* pBuffer
 	}
 	else
 	{
-		if(((fx32 *)pvCam)[pNode->hyperplane.orientation] <= pNode->hyperplane.distance)
+		/* This camera vector needs to actually be the camera position, not the direction
+		which is used for the culling etc. */
+		fakeCam.x = 0;
+		fakeCam.y = 0;
+		fakeCam.z = FX_ONE * 10;
+
+		/* Camera needs to be transformed into BSP space, so multiply by the inverse of the
+		object matrix
+
+		Should store this once right at the top
+		*/
+		objCam = V3xMat3dTransposed(fakeCam, pObj->mat);
+
+		if(((fx32 *)&objCam)[pNode->hyperplane.orientation] < pNode->hyperplane.distance)
 		{
 			renderNode(pObj, pNode->pLeft, pvCam, pvLight, pBuffer);
 			renderNode(pObj, pNode->pRight, pvCam, pvLight, pBuffer);
@@ -527,7 +540,7 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 
 			normalize(&vn);
 
-			if (dot(vn, vCam) <= 0)
+			if (1 || dot(vn, vCam) <= 0)
 			{
 #ifdef FACE_NORMALS
 				fx32 light = dot(pObj->faceNormals[j], vLight);
@@ -543,7 +556,7 @@ void renderObject(Obj *pObj, Mat3d projection, void* pBuffer)
 				}
 				else
 				{
-					col = 0;
+					col = 5;
 				}
 #else
 				col += 0xff;
