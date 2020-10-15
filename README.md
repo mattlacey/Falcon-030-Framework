@@ -32,10 +32,10 @@ A basic C Framework / 3D engine for the Atari Falcon
 - [ ] Texture coordinates?
 
 # LTO Loader / Support
-- [ ] Add vertext data to file format
-- [ ] Add plane data to file format
+- [x] Add vertext data to file format
+- [x] Add plane data to file format
 - [ ] Improve struct initialisation
-- [ ] Tree rendering support
+- [x] Tree rendering support
 
 ## Renderer
 
@@ -44,7 +44,6 @@ A basic C Framework / 3D engine for the Atari Falcon
 - [x] Flat shading
 - [ ] Per face colours
 - [x] Backface culling
-- [ ] Z-buffering
 - [x] Object vector xform optimisation
 - [ ] Background
 - [ ] Text support
@@ -57,3 +56,8 @@ A basic C Framework / 3D engine for the Atari Falcon
 ## Sound
 - [ ] DSPMod for music?
 - [ ] Investigate SFX options
+
+## Optimisations To Consider
+- [ ] Traversing tree and then rendering
+- [ ] Indexed face normals
+- [ ] Culling on face normals prior to tree walk
