@@ -3,6 +3,8 @@
 #include <string.h>
 #include <tos.h>
 #include <ext.h>
+#include <time.h>
+
 
 #include "fx.h"
 #include "framewrk.h"
@@ -10,7 +12,7 @@
 #include "matrix.h"
 #include "obj.h"
 
-#define CUBE	0
+#define CUBE	1
 
 
 #define VM_BPS16	0x4
@@ -42,6 +44,7 @@ void renderBG(void *pBuffer)
 
 int main()
 {
+	clock_t timeStart, timeCurrent;
 	int prevMode;
 	long maxIndices;
 	unsigned long tick = 0;
@@ -73,14 +76,14 @@ int main()
 
 	if(CUBE)
 	{
-/* 		o = loadObj("DATA/CUBE.OBJ");*/
-		o = loadTree("DATA/CUBE.LTO");
-		o.pos = Vec3(0, 0, FX_ONE * 8);
+ 		o = loadTree("DATA/MINE.LTO");
+/*		o = loadTree("DATA/CUBE.LTO");*/
+		o.pos = Vec3(0, 0, FX_ONE * 5);
 	}
 	else
 	{
 		o = loadTree("DATA/ACE.LTO");
-		o.pos = Vec3(0, 0, FX_ONE * 5);
+		o.pos = Vec3(0, 0, FX_ONE * 7);
 	}
 
 	maxIndices = o.indexCount;
@@ -109,7 +112,10 @@ int main()
 
 	xbios(5, buffers[1], buffers[1], -1);
 
-	while(1)
+	timeStart = clock();
+
+	/* run for five seconds */
+	while(clock() - timeStart < CLK_TCK * 5)
 	{
 		current = buffers[1];
 		buffers[1] = buffers[0];
@@ -173,6 +179,8 @@ int main()
 	printf("\nPress a key to continue...\n");
 	while(!kbhit());
 #endif
+
+	printf("Tick count: %ld", tick);
 
 	free(buffers[0]);
 	free(buffers[1]);

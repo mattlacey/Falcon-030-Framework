@@ -104,9 +104,9 @@ Fails when top.y = mid.y, mid.x = bot.x, as soon as mid.x > bot.x then all good
 #endif
 
 #ifdef WIREFRAME
-	renderLine(top->x, top->y, bot->x, bot->y, t.col, pBuffer);
-	renderLine(top->x, top->y, mid->x, mid->y, t.col, pBuffer);
-	renderLine(mid->x, mid->y, bot->x, bot->y, t.col, pBuffer);
+	renderLine(top->x, top->y, bot->x, bot->y, YEL, pBuffer);
+	renderLine(top->x, top->y, mid->x, mid->y, MAG, pBuffer);
+	renderLine(mid->x, mid->y, bot->x, bot->y, CYN, pBuffer);
 #endif
 
 #ifdef POINTS
@@ -162,10 +162,18 @@ void calcSpanBounds(long *boundBuffer, long x1, long y1, long x2, long y2)
 void renderSpan(long x1, long x2, long y, unsigned col, void *pBuffer)
 {
 	long i;
+	long max = (x2 - x1);
+	unsigned int * pTarget = (unsigned int *)pBuffer + (y * (long)320) + x1;
 
-	for(i = x1; i < x2; i++)
+	for(i = max >> 1; i > 0; i--)
 	{
-		*((unsigned int*)pBuffer + i + (y * (long)320)) = col;
+		*pTarget++ = col;
+		*pTarget++ = col;
+	}
+
+	if(max & 1)
+	{
+		*pTarget++ = col;
 	}
 }
 

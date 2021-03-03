@@ -9,9 +9,11 @@
 #define MAG (RED | BLU)
 #define CYN	(GRN | BLU)
 
-/* #define POINTS (1) */
-/*#define WIREFRAME (1)*/
+/*#define POINTS (1)
+#define WIREFRAME (1)*/
 #define FILL (1)
+
+#define NO_CULL (0)
 
 #define RUN_ENGINE (1)
 
